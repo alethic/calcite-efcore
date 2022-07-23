@@ -1,7 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net6.0</TargetFrameworks>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="IKVM" Version="8.2.0" />
+        <PackageReference Include="IKVM.Maven.Sdk" Version="1.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
+        <MavenReference Include="org.apache.calcite:calcite-core" Version="1.30.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Extensions\DbFunctionsExtensions\" />
+      <Folder Include="Query\ExpressionTranslators\Internal\" />
+      <Folder Include="Query\Internal\" />
+    </ItemGroup>
 
 </Project>
