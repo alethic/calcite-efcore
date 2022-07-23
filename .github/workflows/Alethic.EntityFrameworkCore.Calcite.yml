@@ -1,4 +1,4 @@
-name: IKVM.Variadics
+name: Alethic.EntityFrameworkCore.Calcite
 
 on:
   push:
