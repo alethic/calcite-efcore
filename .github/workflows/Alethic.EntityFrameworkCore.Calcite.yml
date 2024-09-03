@@ -89,7 +89,7 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Download IKVM.Variadics Tests
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: tests
         path: build/tests
@@ -120,7 +120,7 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Download IKVM Tests
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: tests
         path: build/tests
@@ -154,7 +154,7 @@ jobs:
       with:
         useConfigFile: true
     - name: Download NuGet Packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: nuget
         path: build/nuget
