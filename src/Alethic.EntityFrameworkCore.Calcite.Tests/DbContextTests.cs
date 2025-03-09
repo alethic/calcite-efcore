@@ -1,15 +1,8 @@
-﻿using System;
-using System.Data;
-using System.Data.Common;
-
-using IKVM.Jdbc.Data;
-
-using java.sql;
+﻿using IKVM.Jdbc.Data;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Spectre.Console;
-using Spectre.Console.Rendering;
 
 namespace Alethic.EntityFrameworkCore.Calcite.Tests
 {
