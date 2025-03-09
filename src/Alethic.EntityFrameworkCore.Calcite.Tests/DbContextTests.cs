@@ -46,7 +46,7 @@ INNER JOIN  DEPTS
 
             for (int i = 0; i < rdr.FieldCount; i++)
             {
-                tbl.AddColumn(new Spectre.Console.TableColumn(rdr.GetName(i));
+                tbl.AddColumn(new Spectre.Console.TableColumn(rdr.GetName(i)));
             }
 
             while (rdr.Read())
