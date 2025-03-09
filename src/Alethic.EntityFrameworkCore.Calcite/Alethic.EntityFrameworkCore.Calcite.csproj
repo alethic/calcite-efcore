@@ -1,20 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0</TargetFrameworks>
+        <TargetFrameworks>net9.0</TargetFrameworks>
+        <Nullable>enable</Nullable>
+        <NoWarn>EF1001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IKVM" Version="8.2.0" />
-        <PackageReference Include="IKVM.Maven.Sdk" Version="1.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.7" />
-        <MavenReference Include="org.apache.calcite:calcite-core" Version="1.30.0" />
+        <PackageReference Include="IKVM.Maven.Sdk" Version="1.10.0-dev.14" />
+        <PackageReference Include="IKVM.Jdbc.Data" Version="1.0.2" />
+        <MavenReference Include="org.apache.calcite:calcite-core" Version="1.38.0" />
+    </ItemGroup>
+
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Extensions\DbFunctionsExtensions\" />
-      <Folder Include="Query\ExpressionTranslators\Internal\" />
-      <Folder Include="Query\Internal\" />
+        <Compile Update="Properties\CalciteStrings.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>CalciteStrings.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\CalciteStrings.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>CalciteStrings.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
 </Project>

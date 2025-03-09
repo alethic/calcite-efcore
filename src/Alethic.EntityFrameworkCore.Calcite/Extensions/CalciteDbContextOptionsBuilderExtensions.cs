@@ -5,7 +5,6 @@ using Alethic.EntityFrameworkCore.Calcite.Infrastructure;
 using Alethic.EntityFrameworkCore.Calcite.Infrastructure.Internal;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Alethic.EntityFrameworkCore.Calcite.Extensions
@@ -13,31 +12,25 @@ namespace Alethic.EntityFrameworkCore.Calcite.Extensions
 
     /// <summary>
     /// Provides extension methods on <see cref="DbContextOptionsBuilder"/> and <see cref="DbContextOptionsBuilder{T}"/>
-    /// used to configure a <see cref="DbContext"/> to context to a PostgreSQL database with Apache Calcite.
+    /// used to configure a <see cref="DbContext"/> to context to Apache Calcite.
     /// </summary>
     public static class CalciteDbContextOptionsBuilderExtensions
     {
 
-
         /// <summary>
-        /// <para>
-        /// Configures the context to connect to Apache Calcite, but without initially setting any <see
-        /// cref="DbConnection" /> or connection string.
-        /// </para>
-        /// <para>
+        /// Configures the context to connect to a Calcite database, but without initially setting any
+        /// <see cref="DbConnection" /> or connection string.
+        /// </summary>
+        /// <remarks>
         /// The connection or connection string must be set before the <see cref="DbContext" /> is used to connect
         /// to a database. Set a connection using <see cref="RelationalDatabaseFacadeExtensions.SetDbConnection" />.
         /// Set a connection string using <see cref="RelationalDatabaseFacadeExtensions.SetConnectionString" />.
-        /// </para>
-        /// </summary>
+        /// </remarks>
         /// <param name="optionsBuilder">The builder being used to configure the context.</param>
-        /// <param name="calciteOptionsAction">An optional action to allow additional Calcite-specific configuration.</param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, Action<CalciteDbContextOptionsBuilder> calciteOptionsAction = null)
+        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
         {
-            if (optionsBuilder is null)
-                throw new ArgumentNullException(nameof(optionsBuilder));
-
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(GetOrCreateExtension(optionsBuilder));
 
             ConfigureWarnings(optionsBuilder);
@@ -48,29 +41,18 @@ namespace Alethic.EntityFrameworkCore.Calcite.Extensions
         }
 
         /// <summary>
-        /// Configures the context to connect to Apache Calcite.
+        /// Configures the context to connect to a Calcite database.
         /// </summary>
-        /// <param name="optionsBuilder">A builder for setting options on the context.</param>
-        /// <param name="connection">
-        /// An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
-        /// in the open state then EF will not open or close the connection. If the connection is in the closed
-        /// state then EF will open and close the connection as needed.
-        /// </param>
-        /// <param name="calciteOptionsAction">An optional action to allow additional Npgsql-specific configuration.</param>
-        /// <returns>
-        /// The options builder so that further configuration can be chained.
-        /// </returns>
+        /// <param name="optionsBuilder">The builder being used to configure the context.</param>
+        /// <param name="connectionString">The connection string of the database to connect to.</param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional Calcite specific configuration.</param>
+        /// <returns>The options builder so that further configuration can be chained.</returns>
         public static DbContextOptionsBuilder UseCalcite(
             this DbContextOptionsBuilder optionsBuilder,
-            DbConnection connection,
-            Action<CalciteDbContextOptionsBuilder> calciteOptionsAction = null)
+            string? connectionString,
+            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
         {
-            if (optionsBuilder is null)
-                throw new ArgumentNullException(nameof(optionsBuilder));
-            if (connection is null)
-                throw new ArgumentNullException(nameof(connection));
-
-            var extension = (CalciteOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnection(connection);
+            var extension = (CalciteOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnectionString(connectionString);
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 
             ConfigureWarnings(optionsBuilder);
@@ -81,42 +63,153 @@ namespace Alethic.EntityFrameworkCore.Calcite.Extensions
         }
 
         /// <summary>
-        /// <para>
-        /// Configures the context to connect to Apache Calcite, but without initially setting any
-        /// <see cref="DbConnection" /> or connection string.
-        /// </para>
-        /// <para>
-        /// The connection or connection string must be set before the <see cref="DbContext" /> is used to connect
-        /// to a database. Set a connection using <see cref="RelationalDatabaseFacadeExtensions.SetDbConnection" />.
-        /// Set a connection string using <see cref="RelationalDatabaseFacadeExtensions.SetConnectionString" />.
-        /// </para>
+        /// Configures the context to connect to a Calcite database.
         /// </summary>
         /// <param name="optionsBuilder">The builder being used to configure the context.</param>
-        /// <param name="calciteOptionsAction">An optional action to allow additional Npgsql-specific configuration.</param>
+        /// <param name="connection">
+        /// An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        /// in the open state then EF will not open or close the connection. If the connection is in the closed
+        /// state then EF will open and close the connection as needed. The caller owns the connection and is
+        /// responsible for its disposal.
+        /// </param>
+        /// <param name="sqliteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, Action<CalciteDbContextOptionsBuilder> calciteOptionsAction = null)
-            where TContext : DbContext
+        public static DbContextOptionsBuilder UseSqlite(
+            this DbContextOptionsBuilder optionsBuilder,
+            DbConnection connection,
+            Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
+            => UseCalcite(optionsBuilder, connection, false, sqliteOptionsAction);
+
+        /// <summary>
+        /// Configures the context to connect to a Calcite database.
+        /// </summary>
+        /// <param name="optionsBuilder">The builder being used to configure the context.</param>
+        /// <param name="connection">
+        ///     An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        ///     in the open state then EF will not open or close the connection. If the connection is in the closed
+        ///     state then EF will open and close the connection as needed.
+        /// </param>
+        /// <param name="contextOwnsConnection">
+        ///     If <see langword="true" />, then EF will take ownership of the connection and will
+        ///     dispose it in the same way it would dispose a connection created by EF. If <see langword="false" />, then the caller still
+        ///     owns the connection and is responsible for its disposal.
+        /// </param>
+        /// <param name="sqliteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
+        /// <returns>The options builder so that further configuration can be chained.</returns>
+        public static DbContextOptionsBuilder UseCalcite(
+            this DbContextOptionsBuilder optionsBuilder,
+            DbConnection connection,
+            bool contextOwnsConnection,
+            Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
         {
-            return (DbContextOptionsBuilder<TContext>)UseCalcite((DbContextOptionsBuilder)optionsBuilder, calciteOptionsAction);
+            ArgumentNullException.ThrowIfNull(connection);
+
+            var extension = (CalciteOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnection(connection, contextOwnsConnection);
+            ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
+
+            ConfigureWarnings(optionsBuilder);
+
+            sqliteOptionsAction?.Invoke(new CalciteDbContextOptionsBuilder(optionsBuilder));
+
+            return optionsBuilder;
         }
 
         /// <summary>
-        /// Returns an existing instance of <see cref="CalciteOptionsExtension"/>, or a new instance if one does not exist.
+        /// Configures the context to connect to a Calcite connection, but without initially setting any
+        /// <see cref="DbConnection" /> or connection string.
         /// </summary>
-        /// <param name="optionsBuilder">The <see cref="DbContextOptionsBuilder"/> to search.</param>
-        /// <returns>
-        /// An existing instance of <see cref="CalciteOptionsExtension"/>, or a new instance if one does not exist.
-        /// </returns>
-        static CalciteOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder optionsBuilder)
-            => optionsBuilder.Options.FindExtension<CalciteOptionsExtension>() is { } existing
-                ? new CalciteOptionsExtension(existing)
-                : new CalciteOptionsExtension();
+        /// <remarks>
+        ///     <para>
+        ///         The connection or connection string must be set before the <see cref="DbContext" /> is used to connect
+        ///         to a database. Set a connection using <see cref="RelationalDatabaseFacadeExtensions.SetDbConnection" />.
+        ///         Set a connection string using <see cref="RelationalDatabaseFacadeExtensions.SetConnectionString" />.
+        ///     </para>
+        /// </remarks>
+        /// <param name="optionsBuilder">The builder being used to configure the context.</param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional Calcite specific configuration.</param>
+        /// <returns>The options builder so that further configuration can be chained.</returns>
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
+            this DbContextOptionsBuilder<TContext> optionsBuilder,
+            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+            where TContext : DbContext
+            => (DbContextOptionsBuilder<TContext>)UseCalcite(
+                (DbContextOptionsBuilder)optionsBuilder, calciteOptionsAction);
 
+        /// <summary>
+        /// Configures the context to connect to a Calcite connection.
+        /// </summary>
+        /// <typeparam name="TContext">The type of context to be configured.</typeparam>
+        /// <param name="optionsBuilder">The builder being used to configure the context.</param>
+        /// <param name="connectionString">The connection string of the database to connect to.</param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
+        /// <returns>The options builder so that further configuration can be chained.</returns>
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
+            this DbContextOptionsBuilder<TContext> optionsBuilder,
+            string? connectionString,
+            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+            where TContext : DbContext
+            => (DbContextOptionsBuilder<TContext>)UseCalcite(
+                (DbContextOptionsBuilder)optionsBuilder, connectionString, calciteOptionsAction);
+
+        /// <summary>
+        /// Configures the context to connect to a Calcite connection.
+        /// </summary>
+        /// <typeparam name="TContext">The type of context to be configured.</typeparam>
+        /// <param name="optionsBuilder">The builder being used to configure the context.</param>
+        /// <param name="connection">
+        /// An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        /// in the open state then EF will not open or close the connection. If the connection is in the closed
+        /// state then EF will open and close the connection as needed. The caller owns the connection and is
+        /// responsible for its disposal.
+        /// </param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
+        /// <returns>The options builder so that further configuration can be chained.</returns>
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
+            this DbContextOptionsBuilder<TContext> optionsBuilder,
+            DbConnection connection,
+            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+            where TContext : DbContext
+            => (DbContextOptionsBuilder<TContext>)UseSqlite(
+                (DbContextOptionsBuilder)optionsBuilder, connection, calciteOptionsAction);
+
+        /// <summary>
+        /// Configures the context to connect to a Calcite database.
+        /// </summary>
+        /// <typeparam name="TContext">The type of context to be configured.</typeparam>
+        /// <param name="optionsBuilder">The builder being used to configure the context.</param>
+        /// <param name="connection">
+        /// An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        /// in the open state then EF will not open or close the connection. If the connection is in the closed
+        /// state then EF will open and close the connection as needed.
+        /// </param>
+        /// <param name="contextOwnsConnection">
+        /// If <see langword="true" />, then EF will take ownership of the connection and will
+        /// dispose it in the same way it would dispose a connection created by EF. If <see langword="false" />, then the caller still
+        /// owns the connection and is responsible for its disposal.
+        /// </param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
+        /// <returns>The options builder so that further configuration can be chained.</returns>
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
+            this DbContextOptionsBuilder<TContext> optionsBuilder,
+            DbConnection connection,
+            bool contextOwnsConnection,
+            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+            where TContext : DbContext
+            => (DbContextOptionsBuilder<TContext>)UseCalcite(
+                (DbContextOptionsBuilder)optionsBuilder, connection, contextOwnsConnection, calciteOptionsAction);
+
+        static CalciteOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder options)
+            => options.Options.FindExtension<CalciteOptionsExtension>()
+                ?? new CalciteOptionsExtension();
 
         static void ConfigureWarnings(DbContextOptionsBuilder optionsBuilder)
         {
-            var coreOptionsExtension = optionsBuilder.Options.FindExtension<CoreOptionsExtension>() ?? new CoreOptionsExtension();
-            coreOptionsExtension = coreOptionsExtension.WithWarningsConfiguration(coreOptionsExtension.WarningsConfiguration.TryWithExplicit(RelationalEventId.AmbientTransactionWarning, WarningBehavior.Throw));
+            var coreOptionsExtension
+                = optionsBuilder.Options.FindExtension<CoreOptionsExtension>()
+                ?? new CoreOptionsExtension();
+
+            coreOptionsExtension = RelationalOptionsExtension.WithDefaultWarningConfiguration(coreOptionsExtension);
+
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(coreOptionsExtension);
         }
 

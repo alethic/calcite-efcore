@@ -7,7 +7,7 @@ namespace Alethic.EntityFrameworkCore.Calcite.Diagnostics.Internal
     public class CalciteLoggingDefinitions : RelationalLoggingDefinitions
     {
 
-
+        public EventDefinitionBase? LogUnexpectedConnectionType;
 
     }
 

@@ -14,7 +14,6 @@ namespace Alethic.EntityFrameworkCore.Calcite.Extensions
     public static class CalciteDatabaseFacadeExtensions
     {
 
-
         /// <summary>
         /// <para>
         /// Returns true if the database provider currently in use is the Calcite provider.
@@ -28,8 +27,8 @@ namespace Alethic.EntityFrameworkCore.Calcite.Extensions
         /// </summary>
         /// <param name="database">The facade from <see cref="DbContext.Database" />.</param>
         /// <returns>True if Calcite is being used; false otherwise.</returns>
-        public static bool IsNpgsql(this DatabaseFacade database)
-            => database.ProviderName == typeof(CalciteOptionsExtension).GetTypeInfo().Assembly.GetName().Name;
+        public static bool IsCalcite(this DatabaseFacade database)
+            => database.ProviderName == typeof(CalciteDatabaseFacadeExtensions).GetTypeInfo().Assembly.GetName().Name;
 
     }
 
