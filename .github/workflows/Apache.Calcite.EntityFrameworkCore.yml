@@ -87,7 +87,7 @@ jobs:
     strategy:
       matrix:
         run:
-        - IKVM.Jdbc.Data.Tests
+        - Apache.Calcite.EntityFrameworkCore.Tests
         sys:
         - win-x64
         - linux-x64
@@ -95,9 +95,6 @@ jobs:
         - osx-x64
         - osx-arm64
         tfm:
-        - net472
-        - net6.0
-        - net8.0
         - net9.0
         exclude:
         - tfm: net472
