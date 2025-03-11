@@ -1,0 +1,33 @@
+<Project DefaultTargets="Publish">
+    <PropertyGroup>
+        <ArtifactStagingDirectory Condition="'$(ArtifactStagingDirectory)' == ''">$(BUILDDIR)</ArtifactStagingDirectory>
+        <ArtifactStagingDirectory Condition="'$(ArtifactStagingDirectory)' == ''">$(BUILD_ARTIFACTSTAGINGDIRECTORY)</ArtifactStagingDirectory>
+        <ArtifactStagingDirectory Condition="'$(ArtifactStagingDirectory)' == ''">$([System.IO.Path]::Combine('$(MSBuildThisFileDirectory)', 'build'))</ArtifactStagingDirectory>
+        <ArtifactStagingDirectory>$([System.IO.Path]::GetFullPath('$(ArtifactStagingDirectory)'))</ArtifactStagingDirectory>
+        <SolutionFile>$([System.IO.Path]::Combine('$(MSBuildThisFileDirectory)', 'Apache.Calcite.EntityFrameworkCore.sln'))</SolutionFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackProperties></PackProperties>
+        <ToolProperties></ToolProperties>
+        <TestProperties></TestProperties>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <TargetsForPublish Include="$(SolutionFile)">
+            <Targets>Alethic_EntityFrameworkCore_Calcite:Pack</Targets>
+            <Properties>$(PackProperties);PackageOutputPath=$(ArtifactStagingDirectory)\nuget</Properties>
+        </TargetsForPublish>
+    </ItemGroup>
+
+    <Target Name="Publish">
+        <ItemGroup>
+            <_TargetsForPublish Include="@(TargetsForPublish)">
+                <Properties>%(Properties);BuildInParallel=false</Properties>
+            </_TargetsForPublish>
+        </ItemGroup>
+
+        <MSBuild BuildInParallel="false" ContinueOnError="false" Projects="@(_TargetsForPublish)" Targets="%(_TargetsForPublish.Targets)" />
+    </Target>
+
+</Project>

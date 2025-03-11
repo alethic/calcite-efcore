@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <PropertyGroup Label="Copyright Info">
-        <ProductName>Alethic.EntityFrameworkCore.Calcite</ProductName>
+        <ProductName>Apache.Calcite.EntityFrameworkCore</ProductName>
         <Authors>@(Authors, ',')</Authors>
         <CurrentYear Condition=" '$(CurrentYear)' == '' ">$([System.DateTime]::UtcNow.Year.ToString())</CurrentYear>
         <Copyright>Copyright © $(CurrentYear) @(Authors, ', ')</Copyright>
@@ -25,9 +25,9 @@
     </PropertyGroup>
 
     <PropertyGroup Label="Package Info">
-        <RepositoryUrl Condition=" '$(RepositoryUrl)' == '' ">https://github.com/alethic/Alethic.EntityFrameworkCore.Calcite.git</RepositoryUrl>
+        <RepositoryUrl Condition=" '$(RepositoryUrl)' == '' ">https://github.com/alethic/Apache.Calcite.EntityFrameworkCore.git</RepositoryUrl>
         <RepositoryType Condition=" '$(RepositoryType)' == '' ">git</RepositoryType>
-        <PackageProjectUrl  Condition=" '$(PackageProjectUrl)' == '' ">https://github.com/alethic/Alethic.EntityFrameworkCore.Calcite</PackageProjectUrl>
+        <PackageProjectUrl  Condition=" '$(PackageProjectUrl)' == '' ">https://github.com/alethic/Apache.Calcite.EntityFrameworkCore</PackageProjectUrl>
         <PackageVersion Condition=" '$(PackageVersion)' == '' ">$(Version)</PackageVersion>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
