@@ -100,6 +100,8 @@ jobs:
         - tfm: net472
           sys: linux-x64
         - tfm: net472
+          sys: linux-arm64
+        - tfm: net472
           sys: osx-x64
         - tfm: net472
           sys: osx-arm64
