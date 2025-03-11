@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
+        <NoWarn>$(NoWarn);MAVEN0012</NoWarn>
         <MavenAdditionalRepositories>$(MavenAdditionalRepositories);redhat=https://maven.repository.redhat.com/ga/</MavenAdditionalRepositories>
     </PropertyGroup>
 
