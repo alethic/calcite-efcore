@@ -1,6 +1,7 @@
 name: Apache.Calcite.EntityFrameworkCore
 
 on:
+  workflow_dispatch:
   push:
     branches:
     - main
@@ -9,183 +10,221 @@ on:
     branches:
     - main
     - develop
+  release:
+    types:
+    - created
 
 jobs:
   build:
-    name: Build IKVM.Variadics
-    runs-on: windows-latest
+    name: Build
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: recursive
+    - name: Setup .NET 9.0
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 9.0.x
+    - name: Install Mono
+      run: |
+        sudo apt-get update && \
+        sudo apt-get install -y mono-runtime mono-devel
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.13
+      uses: gittools/actions/gitversion/setup@v3
       with:
         versionSpec: 5.x
     - name: Execute GitVersion
-      uses: gittools/actions/gitversion/execute@v0.9.13
+      uses: gittools/actions/gitversion/execute@v3
       with:
         useConfigFile: true
-    - name: Setup .NET 3.1
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 3.1.x
-    - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-    - name: Cache NuGet
-      uses: actions/cache@v3
-      with:
-        path: ~\.nuget\packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**\*.csproj', '**\*.msbuildproj') }}
-        restore-keys: ${{ runner.os }}-nuget-
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+    - name: Add NuGet Source (GitHub)
+      shell: pwsh
+      run: dotnet nuget add source --username USERNAME --password $env:GITHUB_TOKEN --store-password-in-clear-text --name ${{ github.repository_owner }} $env:GITHUB_REPOS
+      env:
+        GITHUB_REPOS: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: NuGet Restore
-      run: dotnet restore IKVM.sln
-    - name: Build Artifacts
+      run: dotnet restore Apache.Calcite.EntityFrameworkCore.sln
+    - name: Build
+      shell: pwsh
       run: |
-        msbuild /m:1 `
-          /p:ContinuousIntegrationBuild=true `
+        dotnet msbuild /m /bl `
           /p:Configuration="Release" `
           /p:Platform="Any CPU" `
           /p:Version=${env:GitVersion_FullSemVer} `
-          /p:AssemblyVersion=${env:GitVersion_AssemblyFileVer} `
+          /p:AssemblyVersion=${env:GitVersion_AssemblySemVer} `
           /p:InformationalVersion=${env:GitVersion_InformationalVersion} `
           /p:FileVersion=${env:GitVersion_AssemblySemFileVer} `
           /p:PackageVersion=${env:GitVersion_NuGetVersionV2} `
           /p:RepositoryUrl="${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}.git" `
           /p:PackageProjectUrl="${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}" `
-          IKVM.Variadics.artifacts.msbuildproj
+          /p:BuildInParallel=true `
+          /p:ContinuousIntegrationBuild=true `
+          Apache.Calcite.EntityFrameworkCore.dist.msbuildproj
+    - name: Upload MSBuild Log
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: msbuild.binlog
+        path: msbuild.binlog
     - name: Upload NuGet Packages
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: nuget
-        path: build/nuget
+        path: dist/nuget
+    - name: Package Tests
+      run: tar czvf tests.tar.gz tests
+      working-directory: dist
     - name: Upload Tests
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: tests
-        path: build/tests
-  test-windows:
-    name: Test IKVM.Variadics (Windows)
+        path: dist/tests.tar.gz
+  test:
+    strategy:
+      matrix:
+        run:
+        - IKVM.Jdbc.Data.Tests
+        sys:
+        - win-x64
+        - linux-x64
+        - linux-arm64
+        - osx-x64
+        - osx-arm64
+        tfm:
+        - net472
+        - net6.0
+        - net8.0
+        - net9.0
+        exclude:
+        - tfm: net472
+          sys: linux-x64
+        - tfm: net472
+          sys: osx-x64
+        - tfm: net472
+          sys: osx-arm64
+    name: Test (${{ matrix.run }}:${{ matrix.tfm }}:${{ matrix.sys }})
     needs:
     - build
-    runs-on: windows-latest
+    runs-on: ${{ fromJSON('{"win-x64":["windows-2022"],"linux-x64":["ubuntu-22.04"],"linux-arm64":["ubuntu-22.04-arm"],"osx-x64":["macos-13"],"osx-arm64":["macos-14"]}')[matrix.sys] }}
     steps:
-    - name: Setup .NET 3.1
-      uses: actions/setup-dotnet@v2
+    - name: Setup .NET 9.0
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 3.1.x
-    - name: Setup .NET 5.0
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 5.0.x
-    - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-    - name: Download IKVM.Variadics Tests
-      uses: actions/download-artifact@v3
+        dotnet-version: 9.0.x
+    - name: Add NuGet Source (GitHub)
+      shell: pwsh
+      run: dotnet nuget add source --username USERNAME --password $env:GITHUB_TOKEN --store-password-in-clear-text --name ${{ github.repository_owner }} $env:GITHUB_REPOS
+      env:
+        GITHUB_REPOS: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Download Tests
+      uses: actions/download-artifact@v4
       with:
         name: tests
-        path: build/tests
-    - name: Run Tests
+    - name: Restore Tests
+      run: tar xzvf tests.tar.gz
+    - name: Execute Tests
+      timeout-minutes: 480
       shell: pwsh
-      run: gi .\build\tests\**\*.Tests.dll | group { $_.Directory.BaseName } | %{ dotnet test $_.Group --blame -v 3 --results-directory .\TestResults --logger "trx;LogFileName=$($_.Name).trx" }
+      run: |
+        # assign powershell variables
+        $run = "${{ matrix.run }}"
+        $tfm = "${{ matrix.tfm }}"
+        $sys = "${{ matrix.sys }}"
+
+        # suite name can contain filter expression after ?
+        $split = $run.IndexOf("?")
+        if ($split -gt -1) {
+            $tst = $run.Substring(0, $split)
+            $qry = $run.Substring($split + 1)
+        } else {
+            $tst = $run
+        }
+
+        # scan and process test assemblies
+        $tests = $(gi .\tests\$tst\$tfm\*.Tests.dll)
+        if ($tests) {
+            $argl = @(
+                "-f", $tfm,
+                "-v:diag",
+                "--results-directory", "TestResults",
+                "--logger:console;verbosity=diag",
+                "--logger:trx"
+            )
+            
+            $runsettings = $(gi .\tests\$tst\$tfm\*.runsettings)
+            if ($runsettings) {
+                $argl += "--settings:$runsettings"
+            }
+
+            if ($qry -ne "" -and $qry -ne $null) {
+                $argl += @("--filter", $qry)
+                Add-Content $env:GITHUB_ENV "`nRET=TestResults--$tst-$qry--$tfm--$sys"
+            } else {
+                Add-Content $env:GITHUB_ENV "`nRET=TestResults--$tst--$tfm--$sys"
+            }
+            
+            dotnet test @argl $tests[0].FullName
+        }
+    - name: Archive Test Results
+      if: always() && startsWith(env.RET, 'TestResults--')
+      run: tar czvf TestResults.tar.gz TestResults
     - name: Upload Test Results
-      uses: actions/upload-artifact@v3
+      if: always() && startsWith(env.RET, 'TestResults--')
+      uses: actions/upload-artifact@v4
       with:
-        name: TestResults-windows
-        path: TestResults
-  test-linux:
-    name: Test IKVM.Variadics (Linux)
-    needs:
-    - build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Setup .NET 3.1
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 3.1.x
-    - name: Setup .NET 5.0
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 5.0.x
-    - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: 6.0.x
-    - name: Download IKVM Tests
-      uses: actions/download-artifact@v3
-      with:
-        name: tests
-        path: build/tests
-    - name: Run Tests
-      shell: pwsh
-      run: gi ./build/tests/**/*.Tests.dll | group { $_.Directory.BaseName } | ?{ $_.Name -ne 'net461' } | %{ dotnet test $_.Group --blame -v 3 --results-directory ./TestResults --logger "trx;LogFileName=$($_.Name).trx" }
-    - name: Upload Test Results
-      uses: actions/upload-artifact@v3
-      with:
-        name: TestResults-linux
-        path: TestResults
+        name: ${{ env.RET }}
+        path: TestResults.tar.gz
   release:
     name: Release
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    if: github.event_name != 'pull_request'
     needs:
-    - test-windows
-    - test-linux
-    runs-on: ubuntu-latest
+    - test
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.13
+      uses: gittools/actions/gitversion/setup@v3
       with:
         versionSpec: 5.x
     - name: Execute GitVersion
       id: GitVersion
-      uses: gittools/actions/gitversion/execute@v0.9.13
+      uses: gittools/actions/gitversion/execute@v3
       with:
         useConfigFile: true
     - name: Download NuGet Packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget
-        path: build/nuget
+        path: dist/nuget
     - name: Create Release
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.event.head_commit.message == '+prerelease'
-      uses: ncipollo/release-action@v1.10.0
+      if: github.ref_type == 'tag'
+      uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.GitVersion.outputs.semVer }}
-        artifacts: build/bin/*.zip,build/nuget/*.nupkg,build/nuget/*.snupkg,build/tools/*.zip
-        draft: true
-        generateReleaseNotes: true
-        prerelease: ${{ github.ref == 'refs/heads/develop' }}
+        allowUpdates: true
+        omitBodyDuringUpdate: true
+        artifacts: dist/nuget/*.nupkg,dist/nuget/*.snupkg
+        makeLatest: true
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Push NuGet (GitHub)
+      if: github.event_name != 'pull_request'
       shell: pwsh
-      run: dotnet nuget push build/nuget/*.nupkg --source $env:GITHUB_REPOS --api-key $env:GITHUB_TOKEN --skip-duplicate --no-symbols
+      run: dotnet nuget push dist/nuget/*.nupkg --source $env:GITHUB_REPOS --api-key $env:GITHUB_TOKEN --skip-duplicate
       env:
         GITHUB_REPOS: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Push NuGet (Azure DevOps)
-      shell: pwsh
-      run: |
-        dotnet nuget add source $env:AZUREDEVOPS_REPOS --name az --username az --password $env:AZUREDEVOPS_TOKEN --store-password-in-clear-text
-        dotnet nuget push build/nuget/*.nupkg --source az --api-key az --skip-duplicate --no-symbols
-      env:
-        AZUREDEVOPS_REPOS: https://pkgs.dev.azure.com/ikvm-revived/ikvm/_packaging/ikvm-ci/nuget/v3/index.json
-        AZUREDEVOPS_TOKEN: ${{ secrets.AZUREDEVOPS_PAT }}
     - name: Push NuGet
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.event.head_commit.message == '+prerelease'
+      if: github.ref_type == 'tag'
       shell: pwsh
-      run: dotnet nuget push build/nuget/*.nupkg --source $env:NUGET_REPOS --api-key $env:NUGET_TOKEN --skip-duplicate --no-symbols
+      run: dotnet nuget push dist/nuget/*.nupkg --source $env:NUGET_REPOS --api-key $env:NUGET_TOKEN --skip-duplicate
       env:
         NUGET_REPOS: https://api.nuget.org/v3/index.json
         NUGET_TOKEN: ${{ secrets.NUGET_TOKEN }}
