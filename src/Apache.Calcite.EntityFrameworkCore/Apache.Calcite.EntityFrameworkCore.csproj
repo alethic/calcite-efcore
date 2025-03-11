@@ -4,6 +4,8 @@
         <TargetFrameworks>net9.0</TargetFrameworks>
         <Nullable>enable</Nullable>
         <NoWarn>EF1001</NoWarn>
+        <PackageIconUrl>icon.png</PackageIconUrl>
+        <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +17,11 @@
 
     <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="." Visible="false" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="." Visible="false" />
     </ItemGroup>
 
     <ItemGroup>
