@@ -72,7 +72,7 @@ INNER JOIN  DEPTS
                 ts.Start();
                 using var db = new CsvDbContext();
 
-                var tbl = new Spectre.Console.Table();
+                var tbl = new Table();
                 tbl.AddColumn("Name");
                 tbl.AddColumn("Gender");
                 tbl.AddColumn("City");

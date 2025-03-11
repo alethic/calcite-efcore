@@ -4,8 +4,6 @@ using com.zaxxer.hikari;
 
 using IKVM.Jdbc.Data;
 
-using java.sql;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Apache.Calcite.EntityFrameworkCore.Tests.Csv
