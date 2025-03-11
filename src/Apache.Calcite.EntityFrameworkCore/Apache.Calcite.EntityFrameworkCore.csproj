@@ -6,6 +6,7 @@
         <NoWarn>EF1001</NoWarn>
         <PackageIconUrl>icon.png</PackageIconUrl>
         <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+        <Description>Apache Calcite provider for Entity Framework Core.</Description>
     </PropertyGroup>
 
     <ItemGroup>
