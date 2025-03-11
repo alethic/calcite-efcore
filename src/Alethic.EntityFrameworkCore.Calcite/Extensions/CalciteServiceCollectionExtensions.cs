@@ -10,6 +10,7 @@ using Alethic.EntityFrameworkCore.Calcite.Query;
 using Alethic.EntityFrameworkCore.Calcite.Query.Expressions.Internal;
 using Alethic.EntityFrameworkCore.Calcite.Query.Internal;
 using Alethic.EntityFrameworkCore.Calcite.Storage.Internal;
+using Alethic.EntityFrameworkCore.Calcite.Update;
 using Alethic.EntityFrameworkCore.Calcite.Update.Internal;
 
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
@@ -107,6 +109,9 @@ namespace Alethic.EntityFrameworkCore.Calcite.Extensions
                 .TryAdd<IModificationCommandBatchFactory, CalciteModificationCommandBatchFactory>()
                 .TryAdd<IModificationCommandFactory, CalciteModificationCommandFactory>()
                 .TryAdd<IRelationalConnection>(p => p.GetRequiredService<ICalciteRelationalConnection>())
+                //.TryAdd<IMigrationsSqlGenerator, CalciteMigrationsSqlGenerator>()
+                //.TryAdd<IRelationalDatabaseCreator, CalciteDatabaseCreator>()
+                //.TryAdd<IHistoryRepository, CalciteHistoryRepository>()
                 .TryAdd<IRelationalQueryStringFactory, CalciteQueryStringFactory>()
                 .TryAdd<IQueryCompilationContextFactory, CalciteQueryCompilationContextFactory>()
                 .TryAdd<IMethodCallTranslatorProvider, CalciteMethodCallTranslatorProvider>()
@@ -116,6 +121,7 @@ namespace Alethic.EntityFrameworkCore.Calcite.Extensions
                 .TryAdd<IQueryableMethodTranslatingExpressionVisitorFactory, CalciteQueryableMethodTranslatingExpressionVisitorFactory>()
                 .TryAdd<IRelationalSqlTranslatingExpressionVisitorFactory, CalciteSqlTranslatingExpressionVisitorFactory>()
                 .TryAdd<IQueryTranslationPostprocessorFactory, CalciteQueryTranslationPostprocessorFactory>()
+                .TryAdd<IUpdateSqlGenerator, CalciteUpdateSqlGenerator>()
                 .TryAdd<ISqlExpressionFactory, CalciteSqlExpressionFactory>()
                 .TryAdd<IRelationalParameterBasedSqlProcessorFactory, CalciteParameterBasedSqlProcessorFactory>()
                 .TryAddProviderSpecificServices(b => b.TryAddScoped<ICalciteRelationalConnection, CalciteRelationalConnection>())

@@ -1,5 +1,10 @@
-﻿using IKVM.Jdbc.Data;
+﻿using System.Diagnostics;
 
+using Alethic.EntityFrameworkCore.Calcite.Tests.Csv;
+
+using IKVM.Jdbc.Data;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Spectre.Console;
@@ -54,6 +59,45 @@ INNER JOIN  DEPTS
             AnsiConsole.Write(tbl);
 
             cnn.Open();
+        }
+
+        [TestMethod]
+        public void CanOpenCsvEF()
+        {
+            var ts = new Stopwatch();
+
+            for (int i = 0; i < 5; i++)
+            {
+                ts.Reset();
+                ts.Start();
+                using var db = new CsvDbContext();
+
+                var tbl = new Spectre.Console.Table();
+                tbl.AddColumn("Name");
+                tbl.AddColumn("Gender");
+                tbl.AddColumn("City");
+                tbl.AddColumn("Age");
+                tbl.AddColumn("Slacker");
+                tbl.AddColumn("Join Date");
+                tbl.AddColumn("Department");
+
+                foreach (var employee in db.Employees.Include(i => i.Department))
+                    tbl.AddRow([
+                        employee.Name ?? "",
+                        employee.Gender ?? "",
+                        employee.City ?? "",
+                        employee.Age.ToString(),
+                        employee.Slacker.ToString(),
+                        employee.JoinDate?.ToString(),
+                        employee.Department?.Name ?? "",
+                    ]);
+
+                ts.Stop();
+                tbl.Title = new TableTitle(ts.Elapsed.ToString(), Style.Plain);
+                AnsiConsole.Write(tbl);
+            }
+
+            AnsiConsole.WriteLine("Done");
         }
 
     }
