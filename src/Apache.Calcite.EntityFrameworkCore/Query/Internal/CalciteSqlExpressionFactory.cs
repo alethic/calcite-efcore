@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 
-namespace Apache.Calcite.EntityFrameworkCore.Query
+namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
 
     /// <inheritdoc />

@@ -6,11 +6,10 @@ using Apache.Calcite.EntityFrameworkCore.Infrastructure;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal;
 using Apache.Calcite.EntityFrameworkCore.Metadata.Conventions;
 using Apache.Calcite.EntityFrameworkCore.Metadata.Internal;
-using Apache.Calcite.EntityFrameworkCore.Query;
 using Apache.Calcite.EntityFrameworkCore.Query.Expressions.Internal;
 using Apache.Calcite.EntityFrameworkCore.Query.Internal;
+using Apache.Calcite.EntityFrameworkCore.Storage;
 using Apache.Calcite.EntityFrameworkCore.Storage.Internal;
-using Apache.Calcite.EntityFrameworkCore.Update;
 using Apache.Calcite.EntityFrameworkCore.Update.Internal;
 
 using Microsoft.EntityFrameworkCore;
@@ -99,6 +98,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         public static IServiceCollection AddEntityFrameworkCalcite(this IServiceCollection serviceCollection)
         {
             var builder = new EntityFrameworkRelationalServicesBuilder(serviceCollection)
+                .TryAdd<IParameterNameGeneratorFactory, CalciteParameterNameGeneratorFactory>()
                 .TryAdd<LoggingDefinitions, CalciteLoggingDefinitions>()
                 .TryAdd<IDatabaseProvider, DatabaseProvider<CalciteOptionsExtension>>()
                 .TryAdd<IRelationalTypeMappingSource, CalciteTypeMappingSource>()

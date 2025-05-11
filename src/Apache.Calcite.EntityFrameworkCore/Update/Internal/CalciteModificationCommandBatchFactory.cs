@@ -18,9 +18,13 @@ namespace Apache.Calcite.EntityFrameworkCore.Update.Internal
 
         readonly int _maxBatchSize;
 
-        public CalciteModificationCommandBatchFactory(
-            ModificationCommandBatchFactoryDependencies dependencies,
-            IDbContextOptions options)
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        /// <param name="dependencies"></param>
+        /// <param name="options"></param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public CalciteModificationCommandBatchFactory(ModificationCommandBatchFactoryDependencies dependencies, IDbContextOptions options)
         {
             Dependencies = dependencies;
 
@@ -36,7 +40,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Update.Internal
 
         public ModificationCommandBatch Create()
         {
-            throw new NotImplementedException();
+            return new CalciteModificationCommandBatch(Dependencies, _maxBatchSize);
         }
 
     }
