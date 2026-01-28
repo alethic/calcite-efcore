@@ -117,7 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="LogUnexpectedConnectionType" xml:space="preserve">
+  <data name="TransientExceptionDetected" xml:space="preserve">
+    <value>TransientExceptionDetected</value>
+  </data>
+    <data name="LogUnexpectedConnectionType" xml:space="preserve">
     <value>A connection of an unexpected type ({type}) is being used.</value>
     <comment>Warning CalciteEventId.UnexpectedConnectionTypeWarning string</comment>
   </data>

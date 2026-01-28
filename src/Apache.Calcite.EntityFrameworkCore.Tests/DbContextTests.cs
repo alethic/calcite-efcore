@@ -3,8 +3,6 @@ using System.Linq;
 
 using Apache.Calcite.EntityFrameworkCore.Tests.Csv;
 
-using IKVM.Jdbc.Data;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

@@ -1,11 +1,9 @@
-﻿using Apache.Calcite.EntityFrameworkCore.Query.Internal.Translators;
-
-using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore.Query;
 
 namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
 
-    class CalciteAggregateMethodCallTranslatorProvider : RelationalAggregateMethodCallTranslatorProvider
+    public class CalciteAggregateMethodCallTranslatorProvider : RelationalAggregateMethodCallTranslatorProvider
     {
 
         /// <summary>
@@ -15,13 +13,9 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         public CalciteAggregateMethodCallTranslatorProvider(RelationalAggregateMethodCallTranslatorProviderDependencies dependencies) :
             base(dependencies)
         {
-            var sqlExpressionFactory = (CalciteSqlExpressionFactory)dependencies.SqlExpressionFactory;
-
-            AddTranslators(
-            [
-                new CalciteQueryableAggregateMethodTranslator(sqlExpressionFactory),
-                new CalciteStringAggregateMethodTranslator(sqlExpressionFactory)
-            ]);
+            var sqlExpressionFactory = dependencies.SqlExpressionFactory;
+            var typeMappingSource = dependencies.RelationalTypeMappingSource;
+            AddTranslators([]);
         }
 
     }

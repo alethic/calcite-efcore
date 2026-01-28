@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Apache.Calcite.EntityFrameworkCore.Storage
+namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 {
 
     public class CalciteParameterNameGeneratorFactory : ParameterNameGeneratorFactory

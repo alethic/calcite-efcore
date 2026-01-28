@@ -198,6 +198,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
             => (DbContextOptionsBuilder<TContext>)UseCalcite(
                 (DbContextOptionsBuilder)optionsBuilder, connection, contextOwnsConnection, calciteOptionsAction);
 
+        /// <summary>
+        /// Gets the <see cref="CalciteOptionsExtension"/>.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         static CalciteOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder options)
             => options.Options.FindExtension<CalciteOptionsExtension>()
                 ?? new CalciteOptionsExtension();

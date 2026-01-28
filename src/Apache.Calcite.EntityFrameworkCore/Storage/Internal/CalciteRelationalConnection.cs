@@ -60,7 +60,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
             {
                 if (_commandTimeout.HasValue)
                 {
-                    //jdbcConnection.DefaultTimeout = _commandTimeout.Value;
+
                 }
             }
             else

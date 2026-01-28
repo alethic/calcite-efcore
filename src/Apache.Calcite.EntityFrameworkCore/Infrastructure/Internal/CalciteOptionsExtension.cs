@@ -1,64 +1,109 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 
+using IKVM.Jdbc.Data;
+
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal;
-
-public class CalciteOptionsExtension : RelationalOptionsExtension
+namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
 {
 
-    DbContextOptionsExtensionInfo? _info;
-
-    public CalciteOptionsExtension()
+    public class CalciteOptionsExtension : RelationalOptionsExtension
     {
 
-    }
+        DbContextOptionsExtensionInfo? _info;
+        JdbcProviderFactory? _jdbcProviderFactory;
 
-    protected CalciteOptionsExtension(CalciteOptionsExtension copyFrom)
-        : base(copyFrom)
-    {
-
-    }
-
-    public override DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
-
-    protected override RelationalOptionsExtension Clone() => new CalciteOptionsExtension(this);
-
-    public override void ApplyServices(IServiceCollection services) => services.AddEntityFrameworkCalcite();
-
-    sealed class ExtensionInfo(IDbContextOptionsExtension extension) : RelationalExtensionInfo(extension)
-    {
-
-        string? _logFragment;
-
-        new CalciteOptionsExtension Extension => (CalciteOptionsExtension)base.Extension;
-
-        public override bool IsDatabaseProvider => true;
-
-        public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other) => other is ExtensionInfo;
-
-        public override string LogFragment
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public CalciteOptionsExtension()
         {
-            get
-            {
-                if (_logFragment == null)
-                {
-                    var builder = new StringBuilder();
 
-                    builder.Append(base.LogFragment);
-
-                    _logFragment = builder.ToString();
-                }
-
-                return _logFragment;
-            }
         }
 
-        public override void PopulateDebugInfo(IDictionary<string, string> debugInfo) => debugInfo["Calcite"] = "1";
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        /// <param name="copyFrom"></param>
+        protected CalciteOptionsExtension(CalciteOptionsExtension copyFrom) :
+            base(copyFrom)
+        {
+
+        }
+
+        /// <inheritdoc />
+        public override DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
+
+        /// <inheritdoc />
+        protected override RelationalOptionsExtension Clone() => new CalciteOptionsExtension(this);
+
+        public virtual JdbcProviderFactory? JdbcProviderFactory => _jdbcProviderFactory;
+
+        public virtual CalciteOptionsExtension WithJdbcProviderFactory(JdbcProviderFactory jdbcProviderFactory)
+        {
+            var clone = (CalciteOptionsExtension)Clone();
+            clone._jdbcProviderFactory = jdbcProviderFactory;
+            return clone;
+        }
+
+        /// <inheritdoc />
+        public override void ApplyServices(IServiceCollection services) => services.AddEntityFrameworkCalcite();
+
+        sealed class ExtensionInfo(IDbContextOptionsExtension extension) : RelationalExtensionInfo(extension)
+        {
+
+            int? _serviceProviderHash;
+            string? _logFragment;
+
+            new CalciteOptionsExtension Extension => (CalciteOptionsExtension)base.Extension;
+
+            /// <inheritdoc />
+            public override bool IsDatabaseProvider => true;
+
+            /// <inheritdoc />
+            public override string LogFragment
+            {
+                get
+                {
+                    if (_logFragment == null)
+                    {
+                        var builder = new StringBuilder();
+                        builder.Append(base.LogFragment);
+
+                        if (Extension._jdbcProviderFactory != null)
+                            builder.Append("JdbcProviderFactory ");
+
+                        _logFragment = builder.ToString();
+                    }
+
+                    return _logFragment;
+                }
+            }
+
+            /// <inheritdoc />
+            public override int GetServiceProviderHashCode()
+            {
+                _serviceProviderHash ??= HashCode.Combine(
+                    base.GetServiceProviderHashCode(),
+                    3313,
+                    Extension._jdbcProviderFactory);
+
+                return _serviceProviderHash.Value;
+            }
+
+            /// <inheritdoc />
+            public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
+            {
+                debugInfo["CalciteJdbc:" + nameof(JdbcProviderFactory)] = (Extension._jdbcProviderFactory?.GetHashCode() ?? 0L).ToString(CultureInfo.InvariantCulture);
+            }
+
+        }
 
     }
 

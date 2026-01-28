@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
 
 namespace Apache.Calcite.EntityFrameworkCore.Update.Internal
 {
 
     /// <inheritdoc/>
-    public class CalciteUpdateSqlGenerator : UpdateSqlGenerator
+    public class CalciteUpdateSqlGenerator : UpdateSqlGenerator, ICalciteUpdateSqlGenerator
     {
 
         /// <summary>

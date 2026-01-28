@@ -4,13 +4,13 @@ using System.ComponentModel;
 using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal;
+using Apache.Calcite.EntityFrameworkCore.Internal;
 using Apache.Calcite.EntityFrameworkCore.Metadata.Conventions;
 using Apache.Calcite.EntityFrameworkCore.Metadata.Internal;
-using Apache.Calcite.EntityFrameworkCore.Query.Expressions.Internal;
 using Apache.Calcite.EntityFrameworkCore.Query.Internal;
-using Apache.Calcite.EntityFrameworkCore.Storage;
 using Apache.Calcite.EntityFrameworkCore.Storage.Internal;
 using Apache.Calcite.EntityFrameworkCore.Update.Internal;
+using Apache.Calcite.EntityFrameworkCore.ValueGeneration.Internal;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -21,14 +21,17 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Apache.Calcite.EntityFrameworkCore.Extensions
 {
 
+    /// <summary>
+    /// Calcite specific extension methods for <see cref="IServiceCollection" />.
+    /// </summary>
     public static class CalciteServiceCollectionExtensions
     {
-
         /// <summary>
         /// Registers the given Entity Framework <see cref="DbContext" /> as a service in the <see cref="IServiceCollection" />
         /// and configures it to connect to Calcite.
@@ -60,18 +63,15 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <param name="calciteOptionsAction">An optional action to allow additional Calcite specific configuration.</param>
         /// <param name="optionsAction">An optional action to configure the <see cref="DbContextOptions" /> for the context.</param>
         /// <returns>The same service collection so that multiple calls can be chained.</returns>
-        public static IServiceCollection AddCalcite<TContext>(
-            this IServiceCollection serviceCollection,
-            string? connectionString,
-            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null,
-            Action<DbContextOptionsBuilder>? optionsAction = null)
+        public static IServiceCollection AddCalciteDbContext<TContext>(this IServiceCollection serviceCollection, string? connectionString, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null, Action<DbContextOptionsBuilder>? optionsAction = null)
             where TContext : DbContext
-            => serviceCollection.AddDbContext<TContext>(
-                (_, options) =>
-                {
-                    optionsAction?.Invoke(options);
-                    options.UseCalcite(connectionString, calciteOptionsAction);
-                });
+        {
+            return serviceCollection.AddDbContext<TContext>((_, options) =>
+            {
+                optionsAction?.Invoke(options);
+                options.UseCalcite(connectionString, calciteOptionsAction);
+            });
+        }
 
         /// <summary>
         ///     <para>
@@ -80,7 +80,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         ///     </para>
         ///     <para>
         ///         Warning: Do not call this method accidentally. It is much more likely you need
-        ///         to call <see cref="AddCalcite{TContext}" />.
+        ///         to call <see cref="AddCalciteDbContext{TContext}" />.
         ///     </para>
         /// </summary>
         /// <remarks>
@@ -97,7 +97,9 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static IServiceCollection AddEntityFrameworkCalcite(this IServiceCollection serviceCollection)
         {
-            var builder = new EntityFrameworkRelationalServicesBuilder(serviceCollection)
+            ArgumentNullException.ThrowIfNull(serviceCollection);
+
+            new EntityFrameworkRelationalServicesBuilder(serviceCollection)
                 .TryAdd<IParameterNameGeneratorFactory, CalciteParameterNameGeneratorFactory>()
                 .TryAdd<LoggingDefinitions, CalciteLoggingDefinitions>()
                 .TryAdd<IDatabaseProvider, DatabaseProvider<CalciteOptionsExtension>>()
@@ -106,23 +108,29 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                 .TryAdd<IRelationalAnnotationProvider, CalciteAnnotationProvider>()
                 .TryAdd<IModelValidator, CalciteModelValidator>()
                 .TryAdd<IProviderConventionSetBuilder, CalciteConventionSetBuilder>()
+                .TryAdd<IUpdateSqlGenerator>(p => p.GetRequiredService<ICalciteUpdateSqlGenerator>())
                 .TryAdd<IModificationCommandBatchFactory, CalciteModificationCommandBatchFactory>()
-                .TryAdd<IModificationCommandFactory, CalciteModificationCommandFactory>()
+                .TryAdd<IValueGeneratorSelector, CalciteValueGeneratorSelector>()
                 .TryAdd<IRelationalConnection>(p => p.GetRequiredService<ICalciteRelationalConnection>())
-                //.TryAdd<IMigrationsSqlGenerator, CalciteMigrationsSqlGenerator>()
-                //.TryAdd<IRelationalDatabaseCreator, CalciteDatabaseCreator>()
-                //.TryAdd<IHistoryRepository, CalciteHistoryRepository>()
+                .TryAdd<ICompiledQueryCacheKeyGenerator, CalciteCompiledQueryCacheKeyGenerator>()
+                .TryAdd<IModificationCommandFactory, CalciteModificationCommandFactory>()
+                .TryAdd<IExecutionStrategyFactory, CalciteExecutionStrategyFactory>()
+                .TryAdd<ISingletonOptions, ICalciteOptions>(p => p.GetRequiredService<ICalciteOptions>())
                 .TryAdd<IQueryCompilationContextFactory, CalciteQueryCompilationContextFactory>()
                 .TryAdd<IMethodCallTranslatorProvider, CalciteMethodCallTranslatorProvider>()
                 .TryAdd<IAggregateMethodCallTranslatorProvider, CalciteAggregateMethodCallTranslatorProvider>()
                 .TryAdd<IMemberTranslatorProvider, CalciteMemberTranslatorProvider>()
                 .TryAdd<IQuerySqlGeneratorFactory, CalciteQuerySqlGeneratorFactory>()
                 .TryAdd<IRelationalSqlTranslatingExpressionVisitorFactory, CalciteSqlTranslatingExpressionVisitorFactory>()
-                .TryAdd<IQueryTranslationPostprocessorFactory, CalciteQueryTranslationPostprocessorFactory>()
-                .TryAdd<IUpdateSqlGenerator, CalciteUpdateSqlGenerator>()
                 .TryAdd<ISqlExpressionFactory, CalciteSqlExpressionFactory>()
+                .TryAdd<IQueryTranslationPostprocessorFactory, CalciteQueryTranslationPostprocessorFactory>()
+                .TryAdd<IRelationalTransactionFactory, CalciteTransactionFactory>()
                 .TryAdd<IRelationalParameterBasedSqlProcessorFactory, CalciteParameterBasedSqlProcessorFactory>()
-                .TryAddProviderSpecificServices(b => b.TryAddScoped<ICalciteRelationalConnection, CalciteRelationalConnection>())
+                .TryAdd<IQueryableMethodTranslatingExpressionVisitorFactory, CalciteQueryableMethodTranslatingExpressionVisitorFactory>()
+                .TryAddProviderSpecificServices(b => b
+                    .TryAddSingleton<ICalciteOptions, CalciteOptions>()
+                    .TryAddSingleton<ICalciteUpdateSqlGenerator, CalciteUpdateSqlGenerator>()
+                    .TryAddScoped<ICalciteRelationalConnection, CalciteRelationalConnection>())
                 .TryAddCoreServices();
 
             return serviceCollection;

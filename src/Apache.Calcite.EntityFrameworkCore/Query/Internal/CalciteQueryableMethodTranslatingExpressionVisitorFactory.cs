@@ -1,29 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
 
-    public class CalciteQueryableMethodTranslatingExpressionVisitorFactory : RelationalQueryableMethodTranslatingExpressionVisitorFactory
+    public class CalciteQueryableMethodTranslatingExpressionVisitorFactory(QueryableMethodTranslatingExpressionVisitorDependencies dependencies, RelationalQueryableMethodTranslatingExpressionVisitorDependencies relationalDependencies) : IQueryableMethodTranslatingExpressionVisitorFactory
     {
 
         /// <summary>
-        /// Initializes a new instance.
+        /// Dependencies for this service.
         /// </summary>
-        /// <param name="dependencies"></param>
-        /// <param name="relationalDependencies"></param>
-        public CalciteQueryableMethodTranslatingExpressionVisitorFactory(QueryableMethodTranslatingExpressionVisitorDependencies dependencies, RelationalQueryableMethodTranslatingExpressionVisitorDependencies relationalDependencies) :
-            base(dependencies, relationalDependencies)
-        {
+        protected virtual QueryableMethodTranslatingExpressionVisitorDependencies Dependencies { get; } = dependencies;
 
-        }
+        /// <summary>
+        /// Relational provider-specific dependencies for this service.
+        /// </summary>
+        protected virtual RelationalQueryableMethodTranslatingExpressionVisitorDependencies RelationalDependencies { get; } = relationalDependencies;
 
-        /// <inheritdoc/>
-        public override QueryableMethodTranslatingExpressionVisitor Create(QueryCompilationContext queryCompilationContext)
-        {
-            return new CalciteQueryableMethodTranslatingExpressionVisitor(Dependencies, RelationalDependencies, (CalciteQueryCompilationContext)queryCompilationContext);
-        }
-
+        public virtual QueryableMethodTranslatingExpressionVisitor Create(QueryCompilationContext queryCompilationContext)
+            => new CalciteQueryableMethodTranslatingExpressionVisitor(Dependencies, RelationalDependencies, (RelationalQueryCompilationContext)queryCompilationContext);
     }
 
 }

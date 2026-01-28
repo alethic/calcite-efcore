@@ -3,11 +3,13 @@
 namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
 
-    /// <inheritdoc />
     public class CalciteSqlExpressionFactory : SqlExpressionFactory
     {
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        /// <param name="dependencies"></param>
         public CalciteSqlExpressionFactory(SqlExpressionFactoryDependencies dependencies) :
             base(dependencies)
         {
