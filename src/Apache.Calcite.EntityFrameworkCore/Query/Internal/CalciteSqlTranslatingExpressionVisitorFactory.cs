@@ -22,8 +22,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         /// </summary>
         protected virtual RelationalSqlTranslatingExpressionVisitorDependencies Dependencies => _dependencies;
 
+        /// <inheritdoc/>
         public virtual RelationalSqlTranslatingExpressionVisitor Create(QueryCompilationContext queryCompilationContext, QueryableMethodTranslatingExpressionVisitor queryableMethodTranslatingExpressionVisitor)
-            => new CalciteSqlTranslatingExpressionVisitor(Dependencies, queryCompilationContext, queryableMethodTranslatingExpressionVisitor);
+        {
+            return new CalciteSqlTranslatingExpressionVisitor(Dependencies, queryCompilationContext, queryableMethodTranslatingExpressionVisitor);
+        }
 
     }
 

@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Data.Common;
 
 using Apache.Calcite.EntityFrameworkCore.Infrastructure;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal;
+
+using IKVM.Jdbc.Data;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -19,7 +20,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
 
         /// <summary>
         /// Configures the context to connect to a Calcite database, but without initially setting any
-        /// <see cref="DbConnection" /> or connection string.
+        /// <see cref="JdbcConnection" /> or connection string.
         /// </summary>
         /// <remarks>
         /// The connection or connection string must be set before the <see cref="DbContext" /> is used to connect
@@ -47,10 +48,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <param name="connectionString">The connection string of the database to connect to.</param>
         /// <param name="calciteOptionsAction">An optional action to allow additional Calcite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder UseCalcite(
-            this DbContextOptionsBuilder optionsBuilder,
-            string? connectionString,
-            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, string? connectionString, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
         {
             var extension = (CalciteOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnectionString(connectionString);
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
@@ -67,25 +65,24 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// </summary>
         /// <param name="optionsBuilder">The builder being used to configure the context.</param>
         /// <param name="connection">
-        /// An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        /// An existing <see cref="JdbcConnection" /> to be used to connect to the database. If the connection is
         /// in the open state then EF will not open or close the connection. If the connection is in the closed
         /// state then EF will open and close the connection as needed. The caller owns the connection and is
         /// responsible for its disposal.
         /// </param>
         /// <param name="sqliteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder UseSqlite(
-            this DbContextOptionsBuilder optionsBuilder,
-            DbConnection connection,
-            Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
-            => UseCalcite(optionsBuilder, connection, false, sqliteOptionsAction);
+        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, JdbcConnection connection, Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
+        {
+            return UseCalcite(optionsBuilder, connection, false, sqliteOptionsAction);
+        }
 
         /// <summary>
         /// Configures the context to connect to a Calcite database.
         /// </summary>
         /// <param name="optionsBuilder">The builder being used to configure the context.</param>
         /// <param name="connection">
-        ///     An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        ///     An existing <see cref="JdbcConnection" /> to be used to connect to the database. If the connection is
         ///     in the open state then EF will not open or close the connection. If the connection is in the closed
         ///     state then EF will open and close the connection as needed.
         /// </param>
@@ -96,11 +93,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// </param>
         /// <param name="sqliteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder UseCalcite(
-            this DbContextOptionsBuilder optionsBuilder,
-            DbConnection connection,
-            bool contextOwnsConnection,
-            Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
+        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, JdbcConnection connection, bool contextOwnsConnection, Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
         {
             ArgumentNullException.ThrowIfNull(connection);
 
@@ -116,7 +109,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
 
         /// <summary>
         /// Configures the context to connect to a Calcite connection, but without initially setting any
-        /// <see cref="DbConnection" /> or connection string.
+        /// <see cref="JdbcConnection" /> or connection string.
         /// </summary>
         /// <remarks>
         ///     <para>
@@ -128,12 +121,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <param name="optionsBuilder">The builder being used to configure the context.</param>
         /// <param name="calciteOptionsAction">An optional action to allow additional Calcite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
-            this DbContextOptionsBuilder<TContext> optionsBuilder,
-            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
             where TContext : DbContext
-            => (DbContextOptionsBuilder<TContext>)UseCalcite(
-                (DbContextOptionsBuilder)optionsBuilder, calciteOptionsAction);
+        {
+            return (DbContextOptionsBuilder<TContext>)UseCalcite((DbContextOptionsBuilder)optionsBuilder, calciteOptionsAction);
+        }
 
         /// <summary>
         /// Configures the context to connect to a Calcite connection.
@@ -143,13 +135,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <param name="connectionString">The connection string of the database to connect to.</param>
         /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
-            this DbContextOptionsBuilder<TContext> optionsBuilder,
-            string? connectionString,
-            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, string? connectionString, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
             where TContext : DbContext
-            => (DbContextOptionsBuilder<TContext>)UseCalcite(
-                (DbContextOptionsBuilder)optionsBuilder, connectionString, calciteOptionsAction);
+        {
+            return (DbContextOptionsBuilder<TContext>)UseCalcite((DbContextOptionsBuilder)optionsBuilder, connectionString, calciteOptionsAction);
+        }
 
         /// <summary>
         /// Configures the context to connect to a Calcite connection.
@@ -157,20 +147,18 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <typeparam name="TContext">The type of context to be configured.</typeparam>
         /// <param name="optionsBuilder">The builder being used to configure the context.</param>
         /// <param name="connection">
-        /// An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        /// An existing <see cref="JdbcConnection" /> to be used to connect to the database. If the connection is
         /// in the open state then EF will not open or close the connection. If the connection is in the closed
         /// state then EF will open and close the connection as needed. The caller owns the connection and is
         /// responsible for its disposal.
         /// </param>
         /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
-            this DbContextOptionsBuilder<TContext> optionsBuilder,
-            DbConnection connection,
-            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, JdbcConnection connection, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
             where TContext : DbContext
-            => (DbContextOptionsBuilder<TContext>)UseSqlite(
-                (DbContextOptionsBuilder)optionsBuilder, connection, calciteOptionsAction);
+        {
+            return (DbContextOptionsBuilder<TContext>)UseCalcite((DbContextOptionsBuilder)optionsBuilder, connection, calciteOptionsAction);
+        }
 
         /// <summary>
         /// Configures the context to connect to a Calcite database.
@@ -178,7 +166,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <typeparam name="TContext">The type of context to be configured.</typeparam>
         /// <param name="optionsBuilder">The builder being used to configure the context.</param>
         /// <param name="connection">
-        /// An existing <see cref="DbConnection" /> to be used to connect to the database. If the connection is
+        /// An existing <see cref="JdbcConnection" /> to be used to connect to the database. If the connection is
         /// in the open state then EF will not open or close the connection. If the connection is in the closed
         /// state then EF will open and close the connection as needed.
         /// </param>
@@ -189,14 +177,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// </param>
         /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(
-            this DbContextOptionsBuilder<TContext> optionsBuilder,
-            DbConnection connection,
-            bool contextOwnsConnection,
-            Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
+        public static DbContextOptionsBuilder<TContext> UseCalcite<TContext>(this DbContextOptionsBuilder<TContext> optionsBuilder, JdbcConnection connection, bool contextOwnsConnection, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
             where TContext : DbContext
-            => (DbContextOptionsBuilder<TContext>)UseCalcite(
-                (DbContextOptionsBuilder)optionsBuilder, connection, contextOwnsConnection, calciteOptionsAction);
+        {
+            return (DbContextOptionsBuilder<TContext>)UseCalcite((DbContextOptionsBuilder)optionsBuilder, connection, contextOwnsConnection, calciteOptionsAction);
+        }
 
         /// <summary>
         /// Gets the <see cref="CalciteOptionsExtension"/>.

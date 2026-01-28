@@ -20,7 +20,6 @@
     <ItemGroup>
         <MavenReference Include="org.apache.calcite:calcite-csv" Version="1.38.0" />
         <MavenReference Include="org.apache.calcite.avatica:avatica" Version="1.26.0" />
-        <MavenReference Include="com.zaxxer:HikariCP" Version="4.0.3" />
     </ItemGroup>
 
     <ItemGroup>

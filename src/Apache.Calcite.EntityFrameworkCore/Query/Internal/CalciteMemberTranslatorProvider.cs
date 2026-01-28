@@ -12,8 +12,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         /// </summary>
         /// <param name="dependencies"></param>
         /// <param name="typeMappingSource"></param>
-        public CalciteMemberTranslatorProvider(RelationalMemberTranslatorProviderDependencies dependencies, IRelationalTypeMappingSource typeMappingSource)
-            : base(dependencies)
+        public CalciteMemberTranslatorProvider(RelationalMemberTranslatorProviderDependencies dependencies, IRelationalTypeMappingSource typeMappingSource) :
+            base(dependencies)
         {
             var sqlExpressionFactory = (CalciteSqlExpressionFactory)dependencies.SqlExpressionFactory;
             AddTranslators([]);

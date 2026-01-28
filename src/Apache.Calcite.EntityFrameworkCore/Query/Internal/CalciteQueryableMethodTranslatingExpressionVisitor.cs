@@ -6,7 +6,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
     public class CalciteQueryableMethodTranslatingExpressionVisitor : RelationalQueryableMethodTranslatingExpressionVisitor
     {
 
-        protected readonly RelationalQueryCompilationContext _queryCompilationContext;
+        readonly RelationalQueryCompilationContext _queryCompilationContext;
         readonly bool _subquery;
 
         /// <summary>
@@ -26,15 +26,18 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         /// Initializes a new instance.
         /// </summary>
         /// <param name="parentVisitor"></param>
-        protected CalciteQueryableMethodTranslatingExpressionVisitor(CalciteQueryableMethodTranslatingExpressionVisitor parentVisitor)
-            : base(parentVisitor)
+        protected CalciteQueryableMethodTranslatingExpressionVisitor(CalciteQueryableMethodTranslatingExpressionVisitor parentVisitor) :
+            base(parentVisitor)
         {
             _queryCompilationContext = parentVisitor._queryCompilationContext;
             _subquery = true;
         }
 
+        /// <inheritdoc/>
         protected override QueryableMethodTranslatingExpressionVisitor CreateSubqueryVisitor()
-            => new CalciteQueryableMethodTranslatingExpressionVisitor(this);
+        {
+            return new CalciteQueryableMethodTranslatingExpressionVisitor(this);
+        }
 
     }
 

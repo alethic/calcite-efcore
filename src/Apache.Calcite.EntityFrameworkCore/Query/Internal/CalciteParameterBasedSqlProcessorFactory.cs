@@ -20,8 +20,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         /// </summary>
         protected virtual RelationalParameterBasedSqlProcessorDependencies Dependencies { get; }
 
+        /// <inheritdoc/>
         public RelationalParameterBasedSqlProcessor Create(RelationalParameterBasedSqlProcessorParameters parameters)
-            => new CalciteParameterBasedSqlProcessor(Dependencies, parameters);
+        {
+            return new CalciteParameterBasedSqlProcessor(Dependencies, parameters);
+        }
 
     }
 

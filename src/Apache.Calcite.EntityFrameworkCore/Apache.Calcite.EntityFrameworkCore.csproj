@@ -44,8 +44,4 @@
         </EmbeddedResource>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Query\Expressions\Internal\" />
-    </ItemGroup>
-
 </Project>

@@ -13,6 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
 {
 
+    /// <summary>
+    /// Records options applied to the Calcite context.
+    /// </summary>
     public class CalciteOptionsExtension : RelationalOptionsExtension
     {
 
@@ -43,8 +46,16 @@ namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
         /// <inheritdoc />
         protected override RelationalOptionsExtension Clone() => new CalciteOptionsExtension(this);
 
+        /// <summary>
+        /// Gets the <see cref="JdbcProviderFactory"/> that will be used to initialize new connections.
+        /// </summary>
         public virtual JdbcProviderFactory? JdbcProviderFactory => _jdbcProviderFactory;
 
+        /// <summary>
+        /// Sets the <see cref="JdbcProviderFactory"/> that will be used to initialize new connections.
+        /// </summary>
+        /// <param name="jdbcProviderFactory"></param>
+        /// <returns></returns>
         public virtual CalciteOptionsExtension WithJdbcProviderFactory(JdbcProviderFactory jdbcProviderFactory)
         {
             var clone = (CalciteOptionsExtension)Clone();
