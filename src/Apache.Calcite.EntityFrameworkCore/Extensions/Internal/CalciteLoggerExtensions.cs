@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
+
 using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Apache.Calcite.EntityFrameworkCore.Properties;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Apache.Calcite.EntityFrameworkCore.Extensions.Internal
 {

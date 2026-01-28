@@ -3,11 +3,16 @@
 namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
 
-    public class CalciteCompiledQueryCacheKeyGenerator(CompiledQueryCacheKeyGeneratorDependencies dependencies, RelationalCompiledQueryCacheKeyGeneratorDependencies relationalDependencies) :
-        RelationalCompiledQueryCacheKeyGenerator(dependencies, relationalDependencies)
+    /// <inheritdoc />
+    public class CalciteCompiledQueryCacheKeyGenerator : RelationalCompiledQueryCacheKeyGenerator
     {
 
+        /// <inheritdoc />
+        public CalciteCompiledQueryCacheKeyGenerator(CompiledQueryCacheKeyGeneratorDependencies dependencies, RelationalCompiledQueryCacheKeyGeneratorDependencies relationalDependencies) :
+            base(dependencies, relationalDependencies)
+        {
 
+        }
 
     }
 

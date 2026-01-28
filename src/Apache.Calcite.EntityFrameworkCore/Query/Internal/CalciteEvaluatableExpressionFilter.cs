@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore.Query;
 
-using Microsoft.EntityFrameworkCore.Query;
-
-namespace Apache.Calcite.EntityFrameworkCore.Query.Expressions.Internal
+namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
 
-    /// <inheritdoc />
     public class CalciteEvaluatableExpressionFilter : RelationalEvaluatableExpressionFilter
     {
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instane.
+        /// </summary>
+        /// <param name="dependencies"></param>
+        /// <param name="relationalDependencies"></param>
         public CalciteEvaluatableExpressionFilter(EvaluatableExpressionFilterDependencies dependencies, RelationalEvaluatableExpressionFilterDependencies relationalDependencies) :
             base(dependencies, relationalDependencies)
         {
