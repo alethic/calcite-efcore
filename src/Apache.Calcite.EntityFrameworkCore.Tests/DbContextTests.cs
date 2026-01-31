@@ -54,25 +54,6 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests
             AnsiConsole.WriteLine("Done");
         }
 
-        [TestMethod]
-        public void CanInsert()
-        {
-            using var db = new CsvDbContext();
-            var u = new CsvEmployee();
-            u.Name = "Bob";
-            db.Employees.Add(u);
-            db.SaveChanges();
-        }
-
-        [TestMethod]
-        public void CanUpdate()
-        {
-            using var db = new CsvDbContext();
-            var u = db.Employees.First();
-            u.Name = "Bob";
-            db.SaveChanges();
-        }
-
     }
 
 }

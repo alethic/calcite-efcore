@@ -17,6 +17,14 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
     public class CalciteRelationalConnection : RelationalConnection, ICalciteRelationalConnection
     {
 
+        /// <summary>
+        /// Initializes the static instance.
+        /// </summary>
+        static CalciteRelationalConnection()
+        {
+            java.lang.Class.forName("org.apache.calcite.jdbc.Driver");
+        }
+
         readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
         readonly IDiagnosticsLogger<DbLoggerCategory.Infrastructure> _logger;
         readonly int? _commandTimeout;

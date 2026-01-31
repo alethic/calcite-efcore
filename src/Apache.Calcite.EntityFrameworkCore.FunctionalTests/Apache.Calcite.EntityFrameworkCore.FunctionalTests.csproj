@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSTest.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -13,15 +13,18 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="IKVM.Jdbc.Data" Version="1.0.6" />
-        <PackageReference Include="FluentAssertions" Version="8.8.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational.Specification.Tests" Version="10.0.2" />
-        <PackageReference Include="Spectre.Console" Version="0.54.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-        <MavenReference Include="org.apache.calcite:calcite-csv" Version="1.38.0" />
         <MavenReference Include="org.apache.calcite.avatica:avatica" Version="1.26.0" />
+        <MavenReference Include="org.xerial:sqlite-jdbc" Version="3.51.1.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,18 +32,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Csv\model.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Csv\sales\DEPTS.csv">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Csv\sales\EMPS.csv.gz">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Csv\sales\SDEPTS.csv">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+      <None Update="northwind.db">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

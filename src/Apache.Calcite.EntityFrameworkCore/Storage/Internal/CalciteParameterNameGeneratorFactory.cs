@@ -16,6 +16,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 
         }
 
+        /// <inheritdoc/>
         public override ParameterNameGenerator Create()
         {
             return new CalciteParameterNameGenerator();
