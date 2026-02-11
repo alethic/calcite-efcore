@@ -92,8 +92,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
             var storeTypeName = mappingInfo.StoreTypeName;
             if (storeTypeName != null && _storeTypeMappings.TryGetValue(storeTypeName, out var mappings))
                 foreach (var m in mappings)
-                if (clrType == null || (Nullable.GetUnderlyingType(m.ClrType) ?? m.ClrType) == clrType)
-                    return m;
+                    if (clrType == null || (Nullable.GetUnderlyingType(m.ClrType) ?? m.ClrType) == clrType)
+                        return m;
 
             var storeTypeNameBase = mappingInfo.StoreTypeNameBase;
             if (storeTypeNameBase != null && _storeTypeMappings.TryGetValue(storeTypeNameBase, out var baseMappings))

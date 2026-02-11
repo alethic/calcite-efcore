@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using System.Data;
+using System.Data.Common;
+
+using Microsoft.EntityFrameworkCore.Storage;
 
 using org.apache.calcite.sql.type;
 
@@ -23,6 +26,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
             base(SqlTypeName.BOOLEAN.name())
         {
 
+        }
+
+        public override DbParameter CreateParameter(DbCommand command, string name, object? value, bool? nullable = null, ParameterDirection direction = ParameterDirection.Input)
+        {
+            return base.CreateParameter(command, name, value, nullable, direction);
         }
 
     }

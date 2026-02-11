@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 {
 
+    /// <inheritdoc/>
     public class CalciteTransactionFactory : IRelationalTransactionFactory
     {
 
@@ -27,6 +28,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         /// </summary>
         protected virtual RelationalTransactionFactoryDependencies Dependencies => _dependencies;
 
+        /// <inheritdoc/>
         public virtual RelationalTransaction Create(IRelationalConnection connection, DbTransaction transaction, Guid transactionId, IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> logger, bool transactionOwned)
             => new CalciteTransaction(connection, transaction, transactionId, logger, transactionOwned, Dependencies.SqlGenerationHelper);
 

@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 {
 
+    /// <inheritdoc/>
     public class CalciteTransaction : RelationalTransaction
     {
 

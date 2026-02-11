@@ -10,9 +10,48 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Apache.Calcite.EntityFrameworkCore.Metadata.Conventions
 {
 
-    public class CalciteConventionSetBuilder :
-        RelationalConventionSetBuilder
+    /// <inheritdoc />
+    public class CalciteConventionSetBuilder : RelationalConventionSetBuilder
     {
+
+        static IServiceScope CreateServiceScope()
+        {
+            var serviceProvider = new ServiceCollection()
+                .AddEntityFrameworkCalcite()
+                .AddDbContext<DbContext>((p, o) => o.UseCalcite(o => { }).UseInternalServiceProvider(p))
+                .BuildServiceProvider();
+
+            return serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+        }
+
+        /// <summary>
+        /// Call this method to build a <see cref="ConventionSet" /> for Calcite when using
+        /// the <see cref="ModelBuilder" /> outside of <see cref="DbContext.OnModelCreating" />.
+        /// </summary>
+        /// <remarks>
+        /// Note that it is unusual to use this method. Consider using <see cref="DbContext" /> in the normal way instead.
+        /// </remarks>
+        /// <returns>The convention set.</returns>
+        public static ConventionSet Build()
+        {
+            using var serviceScope = CreateServiceScope();
+            using var context = serviceScope.ServiceProvider.GetRequiredService<DbContext>();
+            return ConventionSet.CreateConventionSet(context);
+        }
+
+        /// <summary>
+        /// Call this method to build a <see cref="ModelBuilder" /> for Calcite outside of <see cref="DbContext.OnModelCreating" />.
+        /// </summary>
+        /// <remarks>
+        /// Note that it is unusual to use this method. Consider using <see cref="DbContext" /> in the normal way instead.
+        /// </remarks>
+        /// <returns>The convention set.</returns>
+        public static ModelBuilder CreateModelBuilder()
+        {
+            using var serviceScope = CreateServiceScope();
+            using var context = serviceScope.ServiceProvider.GetRequiredService<DbContext>();
+            return new ModelBuilder(ConventionSet.CreateConventionSet(context), context.GetService<ModelDependencies>());
+        }
 
         /// <summary>
         /// Initializes a new instance.
@@ -26,34 +65,12 @@ namespace Apache.Calcite.EntityFrameworkCore.Metadata.Conventions
 
         }
 
+        /// <inheritdoc/>
         public override ConventionSet CreateConventionSet()
         {
-            return base.CreateConventionSet();
-        }
-
-        public static ConventionSet Build()
-        {
-            using var serviceScope = CreateServiceScope();
-            using var context = serviceScope.ServiceProvider.GetRequiredService<DbContext>();
-            return ConventionSet.CreateConventionSet(context);
-        }
-
-        public static ModelBuilder CreateModelBuilder()
-        {
-            using var serviceScope = CreateServiceScope();
-            using var context = serviceScope.ServiceProvider.GetRequiredService<DbContext>();
-            return new ModelBuilder(ConventionSet.CreateConventionSet(context), context.GetService<ModelDependencies>());
-        }
-
-        static IServiceScope CreateServiceScope()
-        {
-            var serviceProvider = new ServiceCollection()
-                .AddEntityFrameworkCalcite()
-                .AddDbContext<DbContext>((p, o) => o
-                    .UseInternalServiceProvider(p))
-                .BuildServiceProvider();
-
-            return serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var conventionSet = base.CreateConventionSet();
+            conventionSet.Replace<QueryFilterRewritingConvention>(new CalciteQueryFilterRewritingConvention(Dependencies, RelationalDependencies));
+            return conventionSet;
         }
 
     }

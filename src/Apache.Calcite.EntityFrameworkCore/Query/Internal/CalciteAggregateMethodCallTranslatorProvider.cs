@@ -3,6 +3,7 @@
 namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
 
+    /// <inheritdoc />
     public class CalciteAggregateMethodCallTranslatorProvider : RelationalAggregateMethodCallTranslatorProvider
     {
 

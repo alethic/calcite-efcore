@@ -16,6 +16,12 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests
     {
 
         [TestMethod]
+        public void Foo()
+        {
+            var d = new java.util.Date(90, 1, 1);
+        }
+
+        [TestMethod]
         public void CanSelectWithInclude()
         {
             var ts = new Stopwatch();

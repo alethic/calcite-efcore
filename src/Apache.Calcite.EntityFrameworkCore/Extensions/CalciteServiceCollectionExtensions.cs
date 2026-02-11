@@ -127,6 +127,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                 .TryAdd<IRelationalTransactionFactory, CalciteTransactionFactory>()
                 .TryAdd<IRelationalParameterBasedSqlProcessorFactory, CalciteParameterBasedSqlProcessorFactory>()
                 .TryAdd<IQueryableMethodTranslatingExpressionVisitorFactory, CalciteQueryableMethodTranslatingExpressionVisitorFactory>()
+                .TryAdd<IRelationalCommandBuilderFactory, CalciteRelationalCommandBuilderFactory>()
                 .TryAddProviderSpecificServices(b => b
                     .TryAddSingleton<ICalciteOptions, CalciteOptions>()
                     .TryAddSingleton<ICalciteUpdateSqlGenerator, CalciteUpdateSqlGenerator>()

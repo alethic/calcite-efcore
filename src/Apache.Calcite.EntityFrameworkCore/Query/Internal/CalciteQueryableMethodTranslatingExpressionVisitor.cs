@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
 {
@@ -37,6 +39,12 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         protected override QueryableMethodTranslatingExpressionVisitor CreateSubqueryVisitor()
         {
             return new CalciteQueryableMethodTranslatingExpressionVisitor(this);
+        }
+
+        /// <inheritdoc/>
+        protected override SelectExpression CreateSelect(IEntityType entityType)
+        {
+            return base.CreateSelect(entityType);
         }
 
     }

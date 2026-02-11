@@ -8,7 +8,8 @@ using Apache.Calcite.EntityFrameworkCore.Infrastructure;
 
 using IKVM.Jdbc.Data;
 
-using java.util;
+using java.sql;
+using java.time;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -16,10 +17,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
+using org.apache.calcite.adapter.java;
+using org.apache.calcite.jdbc;
+using org.apache.calcite.sql.validate;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
 {
 
-    public class CalciteTestStore : RelationalTestStore
+    public partial class CalciteTestStore : RelationalTestStore
     {
 
         /// <summary>
@@ -27,6 +32,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         /// </summary>
         static CalciteTestStore()
         {
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(NorthwindReflectiveTarget).Assembly);
             ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.sqlite.JDBC).Assembly);
             ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.jdbc.Driver).Assembly);
         }
@@ -135,7 +141,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             return (T)command.ExecuteScalar()!;
         }
 
-        private DbCommand CreateCommand(string commandText, object[] parameters)
+        DbCommand CreateCommand(string commandText, object[] parameters)
         {
             var command = (JdbcCommand)Connection.CreateCommand();
 
@@ -143,24 +149,26 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             command.CommandTimeout = CommandTimeout;
 
             for (var i = 0; i < parameters.Length; i++)
-            {
                 command.Parameters.AddWithValue("@p" + i, parameters[i]);
-            }
 
             return command;
         }
 
-        private static JdbcConnection CreateConnection(string name)
+        static JdbcConnection CreateConnection(string name)
         {
             var p = new java.util.Properties();
             var s = new CalciteConnectionProperties(p);
             s.Schema = "NORTHWIND";
-            s.SchemaFactory = "org.apache.calcite.adapter.jdbc.JdbcSchema$Factory";
-            s.SchemaType = "JDBC";
-            s.SchemaProperties["jdbcDriver"] = "org.sqlite.JDBC";
-            s.SchemaProperties["jdbcUrl"] = $"jdbc:sqlite:{name}.db";
-            s.SchemaProperties["jdbcSchema"] = "public";
-            return new JdbcConnection("jdbc:calcite:", p.AsDictionary<string, string>());
+            s.Conformance = SqlConformanceEnum.DEFAULT;
+
+            var connection = DriverManager.getConnection("jdbc:calcite:", p);
+            var calciteConnection = (CalciteConnection)connection.unwrap(typeof(CalciteConnection));
+            var rootSchema = calciteConnection.getRootSchema();
+            var schema = new ReflectiveSchema(new NorthwindReflectiveTarget());
+            rootSchema.add("NORTHWIND", schema);
+            calciteConnection.setSchema("NORTHWIND");
+
+            return new JdbcConnection(connection);
         }
 
     }

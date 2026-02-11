@@ -33,8 +33,10 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         /// </summary>
         protected virtual RelationalQueryCompilationContextDependencies RelationalDependencies { get; }
 
+        /// <inheritdoc/>
         public virtual QueryCompilationContext Create(bool async) => new CalciteQueryCompilationContext(Dependencies, RelationalDependencies, async);
 
+        /// <inheritdoc/>
         public virtual QueryCompilationContext CreatePrecompiled(bool async) => new CalciteQueryCompilationContext(Dependencies, RelationalDependencies, async, precompiling: true);
 
     }
