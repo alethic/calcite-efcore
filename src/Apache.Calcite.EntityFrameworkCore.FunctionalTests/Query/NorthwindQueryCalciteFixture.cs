@@ -10,14 +10,17 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
 {
 
+    /// <inheritdoc/>
     public class NorthwindQueryCalciteFixture<TModelCustomizer> : NorthwindQueryRelationalFixture<TModelCustomizer>
         where TModelCustomizer : ITestModelCustomizer, new()
     {
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteNorthwindTestStoreFactory.Instance;
 
-        protected override Type ContextType
-            => typeof(NorthwindCalciteContext);
+        /// <inheritdoc/>
+        protected override ITestStoreFactory TestStoreFactory => ReflectiveSchemaNorthwindTestStoreFactory.Instance;
+
+        /// <inheritdoc/>
+        protected override Type ContextType => typeof(NorthwindCalciteContext);
+
     }
 
 }

@@ -1,19 +1,15 @@
 ﻿using java.math;
 
-namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities.NorthwindReflectiveSchema
 {
 
-    public partial class NorthwindReflectiveTarget
+    public class OrderDetail
     {
-        public class OrderDetail
-        {
-            public int OrderID;
-            public int ProductID;
-            public BigDecimal UnitPrice;
-            public short Quantity;
-            public float Discount;
-        }
-
+        public int OrderID;
+        public int ProductID;
+        public BigDecimal UnitPrice;
+        public short Quantity;
+        public float Discount;
     }
 
 }

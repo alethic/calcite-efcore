@@ -6,10 +6,15 @@ using java.math;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 
-namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
+using org.apache.calcite.adapter.java;
+
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities.NorthwindReflectiveSchema
 {
 
-    public partial class NorthwindReflectiveTarget
+    /// <summary>
+    /// Object targeted by <see cref="ReflectiveSchema"/>.
+    /// </summary>
+    public partial class SchemaTarget
     {
 
         public Customer[] Customers = NorthwindData.Instance.Customers

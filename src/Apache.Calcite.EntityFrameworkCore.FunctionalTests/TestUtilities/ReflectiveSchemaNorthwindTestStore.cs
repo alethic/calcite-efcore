@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 using Apache.Calcite.Data;
 using Apache.Calcite.EntityFrameworkCore.Extensions;
+using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities.NorthwindReflectiveSchema;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure;
 
 using IKVM.Jdbc.Data;
 
 using java.sql;
-using java.time;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -24,41 +24,53 @@ using org.apache.calcite.sql.validate;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
 {
 
-    public partial class CalciteTestStore : RelationalTestStore
+    /// <summary>
+    /// <see cref="RelationalTestStore"/> implementation for Calcite's RelationalSchema provider against Northwind.
+    /// </summary>
+    public partial class ReflectiveSchemaNorthwindTestStore : RelationalTestStore
     {
+
+        static readonly SchemaTarget SchemaTarget = new SchemaTarget();
 
         /// <summary>
         /// Initializes the static instance.
         /// </summary>
-        static CalciteTestStore()
+        static ReflectiveSchemaNorthwindTestStore()
         {
-            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(NorthwindReflectiveTarget).Assembly);
-            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.sqlite.JDBC).Assembly);
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(SchemaTarget).Assembly);
             ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.jdbc.Driver).Assembly);
         }
 
         public const int CommandTimeout = 30;
 
-        public static CalciteTestStore GetOrCreate(string name)
+        public static ReflectiveSchemaNorthwindTestStore GetOrCreate(string name)
             => new(name);
 
-        public static async Task<CalciteTestStore> GetOrCreateInitializedAsync(string name)
-            => await new CalciteTestStore(name).InitializeSqliteAsync(
+        public static async Task<ReflectiveSchemaNorthwindTestStore> GetOrCreateInitializedAsync(string name)
+            => await new ReflectiveSchemaNorthwindTestStore(name).InitializeCalciteAsync(
                 new ServiceCollection().AddEntityFrameworkCalcite().BuildServiceProvider(validateScopes: true),
                 (Func<DbContext>?)null,
                 null);
 
-        public static CalciteTestStore GetExisting(string name)
+        public static ReflectiveSchemaNorthwindTestStore GetExisting(string name)
             => new(name, seed: false);
 
-        public static CalciteTestStore Create(string name)
+        public static ReflectiveSchemaNorthwindTestStore Create(string name)
             => new(name, shared: false);
 
-        private readonly bool _seed;
+        readonly bool _seed;
 
-        private CalciteTestStore(string name, bool seed = true, bool shared = true)
-            : base(name, shared, CreateConnection(name))
-            => _seed = seed;
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="seed"></param>
+        /// <param name="shared"></param>
+        private ReflectiveSchemaNorthwindTestStore(string name, bool seed = true, bool shared = true) :
+            base(name, shared, CreateConnection(name))
+        {
+            _seed = seed;
+        }
 
         public virtual DbContextOptionsBuilder AddProviderOptions(
             DbContextOptionsBuilder builder,
@@ -79,20 +91,21 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
                         configureSqlite?.Invoke(b);
                     });
 
+        /// <inheritdoc/>
         public override DbContextOptionsBuilder AddProviderOptions(DbContextOptionsBuilder builder)
             => AddProviderOptions(builder, configureSqlite: null);
 
-        public async Task<CalciteTestStore> InitializeSqliteAsync(
+        public async Task<ReflectiveSchemaNorthwindTestStore> InitializeCalciteAsync(
             IServiceProvider? serviceProvider,
             Func<DbContext>? createContext,
             Func<DbContext, Task>? seed)
-            => (CalciteTestStore)await InitializeAsync(serviceProvider, createContext, seed);
+            => (ReflectiveSchemaNorthwindTestStore)await InitializeAsync(serviceProvider, createContext, seed);
 
-        public async Task<CalciteTestStore> InitializeSqliteAsync(
+        public async Task<ReflectiveSchemaNorthwindTestStore> InitializeCalciteAsync(
             IServiceProvider serviceProvider,
-            Func<CalciteTestStore, DbContext> createContext,
+            Func<ReflectiveSchemaNorthwindTestStore, DbContext> createContext,
             Func<DbContext, Task> seed)
-            => (CalciteTestStore)await InitializeAsync(serviceProvider, () => createContext(this), seed);
+            => (ReflectiveSchemaNorthwindTestStore)await InitializeAsync(serviceProvider, () => createContext(this), seed);
 
         protected override async Task InitializeAsync(Func<DbContext> createContext, Func<DbContext, Task>? seed, Func<DbContext, Task>? clean)
         {
@@ -149,7 +162,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             command.CommandTimeout = CommandTimeout;
 
             for (var i = 0; i < parameters.Length; i++)
-                command.Parameters.AddWithValue("@p" + i, parameters[i]);
+                command.Parameters.AddWithValue(i.ToString(), parameters[i]);
 
             return command;
         }
@@ -164,7 +177,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             var connection = DriverManager.getConnection("jdbc:calcite:", p);
             var calciteConnection = (CalciteConnection)connection.unwrap(typeof(CalciteConnection));
             var rootSchema = calciteConnection.getRootSchema();
-            var schema = new ReflectiveSchema(new NorthwindReflectiveTarget());
+            var schema = new ReflectiveSchema(SchemaTarget);
             rootSchema.add("NORTHWIND", schema);
             calciteConnection.setSchema("NORTHWIND");
 

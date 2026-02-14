@@ -17,7 +17,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
@@ -128,6 +127,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                 .TryAdd<IRelationalParameterBasedSqlProcessorFactory, CalciteParameterBasedSqlProcessorFactory>()
                 .TryAdd<IQueryableMethodTranslatingExpressionVisitorFactory, CalciteQueryableMethodTranslatingExpressionVisitorFactory>()
                 .TryAdd<IRelationalCommandBuilderFactory, CalciteRelationalCommandBuilderFactory>()
+                .TryAdd<IRelationalDatabaseCreator, CalciteDatabaseCreator>()
                 .TryAddProviderSpecificServices(b => b
                     .TryAddSingleton<ICalciteOptions, CalciteOptions>()
                     .TryAddSingleton<ICalciteUpdateSqlGenerator, CalciteUpdateSqlGenerator>()
