@@ -93,6 +93,54 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
             return model.FindAnnotation(CalciteAnnotationNames.ValueGenerationStrategy)?.GetConfigurationSource();
         }
 
+        /// <summary>
+        /// Gets the CLR type of the entity that backs default per-entity HiLo sequences for this model, if configured.
+        /// </summary>
+        public static System.Type? GetDefaultEntitySequenceEntityType(this IReadOnlyModel model)
+        {
+            return (System.Type?)model[CalciteAnnotationNames.DefaultEntitySequenceEntityType];
+        }
+
+        /// <summary>
+        /// Sets the CLR type of the entity that backs default per-entity HiLo sequences for this model.
+        /// </summary>
+        public static void SetDefaultEntitySequenceEntityType(this IMutableModel model, System.Type? type)
+        {
+            model.SetOrRemoveAnnotation(CalciteAnnotationNames.DefaultEntitySequenceEntityType, type);
+        }
+
+        /// <summary>
+        /// Gets the name of the property on the default sequence backing entity that identifies a sequence row.
+        /// </summary>
+        public static string? GetDefaultEntitySequenceNameProperty(this IReadOnlyModel model)
+        {
+            return (string?)model[CalciteAnnotationNames.DefaultEntitySequenceNameProperty];
+        }
+
+        /// <summary>
+        /// Sets the name of the property on the default sequence backing entity that identifies a sequence row.
+        /// </summary>
+        public static void SetDefaultEntitySequenceNameProperty(this IMutableModel model, string? name)
+        {
+            model.SetOrRemoveAnnotation(CalciteAnnotationNames.DefaultEntitySequenceNameProperty, name);
+        }
+
+        /// <summary>
+        /// Gets the name of the property on the default sequence backing entity that holds the sequence value.
+        /// </summary>
+        public static string? GetDefaultEntitySequenceValueProperty(this IReadOnlyModel model)
+        {
+            return (string?)model[CalciteAnnotationNames.DefaultEntitySequenceValueProperty];
+        }
+
+        /// <summary>
+        /// Sets the name of the property on the default sequence backing entity that holds the sequence value.
+        /// </summary>
+        public static void SetDefaultEntitySequenceValueProperty(this IMutableModel model, string? name)
+        {
+            model.SetOrRemoveAnnotation(CalciteAnnotationNames.DefaultEntitySequenceValueProperty, name);
+        }
+
     }
 
 }

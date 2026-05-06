@@ -140,7 +140,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                 .TryAddProviderSpecificServices(b => b
                     .TryAddSingleton<ICalciteOptions, CalciteOptions>()
                     .TryAddSingleton<ICalciteValueGeneratorCache, CalciteValueGeneratorCache>()
-                    .TryAddSingleton<ICalciteSequenceValueGeneratorFactory, CalciteSequenceValueGeneratorFactory>()
+                    .TryAddScoped<ICalciteSequenceValueGeneratorFactory, CalciteSequenceValueGeneratorFactory>()
                     .TryAddScoped<ICalciteConnection, CalciteRelationalConnection>())
                 .TryAddCoreServices();
 

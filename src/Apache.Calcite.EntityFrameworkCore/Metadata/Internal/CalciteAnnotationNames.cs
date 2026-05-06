@@ -18,6 +18,21 @@
         /// </summary>
         public const string EntitySequenceName = Prefix + nameof(EntitySequenceName);
 
+        /// <summary>
+        /// The CLR type name of the entity that backs default per-entity HiLo sequences for the model.
+        /// </summary>
+        public const string DefaultEntitySequenceEntityType = Prefix + nameof(DefaultEntitySequenceEntityType);
+
+        /// <summary>
+        /// The name of the property on the default sequence backing entity that identifies a sequence row.
+        /// </summary>
+        public const string DefaultEntitySequenceNameProperty = Prefix + nameof(DefaultEntitySequenceNameProperty);
+
+        /// <summary>
+        /// The name of the property on the default sequence backing entity that holds the sequence value.
+        /// </summary>
+        public const string DefaultEntitySequenceValueProperty = Prefix + nameof(DefaultEntitySequenceValueProperty);
+
     }
 
 }
