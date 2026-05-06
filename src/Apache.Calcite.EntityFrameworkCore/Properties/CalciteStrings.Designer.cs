@@ -61,6 +61,24 @@ namespace Apache.Calcite.EntityFrameworkCore.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid type for generator table. Valid types are &apos;long&apos; (the default), &apos;int&apos;, &apos;short&apos;, &apos;byte&apos; and &apos;decimal&apos;..
+        /// </summary>
+        internal static string BadGeneratorTableType {
+            get {
+                return ResourceManager.GetString("BadGeneratorTableType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transactions are not supported by the Calcite store.
+        /// </summary>
+        internal static string LogTransactionsNotSupported {
+            get {
+                return ResourceManager.GetString("LogTransactionsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A connection of an unexpected type ({type}) is being used..
         /// </summary>
         internal static string LogUnexpectedConnectionType {

@@ -8,7 +8,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
     public class CalciteQueryCompilationContextFactory : IQueryCompilationContextFactory
     {
 
-        readonly ICalciteRelationalConnection _calciteJdbcConnection;
+        readonly ICalciteConnection _calciteJdbcConnection;
 
         /// <summary>
         /// Initializes a new instance.
@@ -16,7 +16,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         /// <param name="dependencies"></param>
         /// <param name="relationalDependencies"></param>
         /// <param name="jetConnection"></param>
-        public CalciteQueryCompilationContextFactory(QueryCompilationContextDependencies dependencies, RelationalQueryCompilationContextDependencies relationalDependencies, ICalciteRelationalConnection jetConnection)
+        public CalciteQueryCompilationContextFactory(QueryCompilationContextDependencies dependencies, RelationalQueryCompilationContextDependencies relationalDependencies, ICalciteConnection jetConnection)
         {
             _calciteJdbcConnection = jetConnection;
             Dependencies = dependencies;

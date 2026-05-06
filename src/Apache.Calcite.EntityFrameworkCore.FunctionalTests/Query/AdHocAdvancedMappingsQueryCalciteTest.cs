@@ -14,10 +14,12 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
         /// Initializes a new instance.
         /// </summary>
         /// <param name="fixture"></param>
-        public AdHocAdvancedMappingsQueryCalciteTest(NonSharedFixture fixture) : base(fixture)
+        public AdHocAdvancedMappingsQueryCalciteTest(NonSharedFixture fixture) :
+            base(fixture)
         {
 
         }
+
         /// <inheritdoc/>
         protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 

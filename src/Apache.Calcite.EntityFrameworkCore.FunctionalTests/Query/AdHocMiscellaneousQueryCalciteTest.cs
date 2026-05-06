@@ -35,6 +35,11 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
             throw new System.NotImplementedException();
         }
 
+        class Context24657
+        {
+
+        }
+
     }
 
 }

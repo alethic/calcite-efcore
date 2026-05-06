@@ -22,7 +22,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
         /// Initializes a new instance.
         /// </summary>
         public CalciteDateTimeOffsetTypeMapping() :
-            base(SqlTypeName.TIMESTAMP_TZ.name())
+            base("TIMESTAMP WITH TIME ZONE")
         {
 
         }

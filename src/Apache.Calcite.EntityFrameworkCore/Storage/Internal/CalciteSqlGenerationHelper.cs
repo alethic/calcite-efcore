@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -21,7 +20,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         }
 
         /// <inheritdoc/>
-        public override string StatementTerminator => throw new NotSupportedException("Calcite does not support multiple statements per command.");
+        public override string StatementTerminator => ";";
 
         /// <inheritdoc/>
         public override string GenerateParameterName(string name) => name;

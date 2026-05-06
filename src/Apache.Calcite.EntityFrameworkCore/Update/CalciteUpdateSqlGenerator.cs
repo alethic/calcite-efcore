@@ -5,11 +5,11 @@ using System.Text;
 
 using Microsoft.EntityFrameworkCore.Update;
 
-namespace Apache.Calcite.EntityFrameworkCore.Update.Internal
+namespace Apache.Calcite.EntityFrameworkCore.Update
 {
 
     /// <inheritdoc/>
-    public class CalciteUpdateSqlGenerator : UpdateSqlGenerator, ICalciteUpdateSqlGenerator
+    public class CalciteUpdateSqlGenerator : UpdateSqlGenerator
     {
 
         /// <summary>
@@ -28,7 +28,6 @@ namespace Apache.Calcite.EntityFrameworkCore.Update.Internal
             AppendInsertCommandHeader(commandStringBuilder, name, schema, writeOperations);
             AppendValuesHeader(commandStringBuilder, writeOperations);
             AppendValues(commandStringBuilder, name, schema, writeOperations);
-            SetGetGeneratedKeys(commandStringBuilder, readOperations);
         }
 
         /// <inheritdoc/>
@@ -55,17 +54,6 @@ namespace Apache.Calcite.EntityFrameworkCore.Update.Internal
 
             AppendUpdateCommandHeader(commandStringBuilder, name, schema, writeOperations);
             AppendWhereClause(commandStringBuilder, conditionOperations);
-            SetGetGeneratedKeys(commandStringBuilder, readOperations);
-        }
-
-        /// <inheritdoc/>
-        protected void SetGetGeneratedKeys(StringBuilder commandStringBuilder, IReadOnlyList<IColumnModification> operations)
-        {
-            if (operations.Count > 0)
-            {
-                commandStringBuilder
-                    .AppendLine("-- :GetGeneratedKeys");
-            }
         }
 
     }

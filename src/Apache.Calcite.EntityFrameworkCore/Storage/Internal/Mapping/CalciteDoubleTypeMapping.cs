@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 
-using org.apache.calcite.sql.type;
-
 namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
 {
 
@@ -20,7 +18,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
         /// Initializes a new instance.
         /// </summary>
         public CalciteDoubleTypeMapping() :
-            base(SqlTypeName.DOUBLE.name())
+            base("DOUBLE")
         {
 
         }

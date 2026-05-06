@@ -14,6 +14,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities.North
     /// <summary>
     /// Object targeted by <see cref="ReflectiveSchema"/>.
     /// </summary>
+
     public partial class SchemaTarget
     {
 

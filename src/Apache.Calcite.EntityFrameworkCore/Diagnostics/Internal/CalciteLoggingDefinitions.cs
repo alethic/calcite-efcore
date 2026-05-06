@@ -9,6 +9,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal
 
         public EventDefinitionBase? LogUnexpectedConnectionType;
 
+        public EventDefinitionBase? LogTransactionsNotSupported;
+
     }
 
 }

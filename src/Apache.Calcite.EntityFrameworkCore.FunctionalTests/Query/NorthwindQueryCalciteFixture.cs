@@ -16,7 +16,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
     {
 
         /// <inheritdoc/>
-        protected override ITestStoreFactory TestStoreFactory => ReflectiveSchemaNorthwindTestStoreFactory.Instance;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
         /// <inheritdoc/>
         protected override Type ContextType => typeof(NorthwindCalciteContext);

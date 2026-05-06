@@ -1,13 +1,12 @@
 ﻿using System;
 
-using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
 using Apache.Calcite.EntityFrameworkCore.Properties;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Apache.Calcite.EntityFrameworkCore.Extensions.Internal
+namespace Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal
 {
 
     public static class CalciteLoggerExtensions
@@ -34,6 +33,19 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions.Internal
             var d = (EventDefinition<string>)definition;
             var p = (UnexpectedConnectionTypeEventData)payload;
             return d.GenerateMessage(p.ConnectionType.ShortDisplayName());
+        }
+        public static void TransactionIgnoredWarning(this IDiagnosticsLogger<DbLoggerCategory.Database.Transaction> diagnostics)
+        {
+            var definition = CalciteResources.LogTransactionsNotSupported(diagnostics);
+
+            if (diagnostics.ShouldLog(definition))
+                definition.Log(diagnostics);
+
+            if (diagnostics.NeedsEventData(definition, out var diagnosticSourceEnabled, out var simpleLogEnabled))
+            {
+                var eventData = new EventData(definition, (d, _) => ((EventDefinition)d).GenerateMessage());
+                diagnostics.DispatchEventData(definition, eventData, diagnosticSourceEnabled, simpleLogEnabled);
+            }
         }
 
     }

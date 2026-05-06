@@ -12,7 +12,7 @@ using org.omg.PortableInterceptor;
 namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 {
 
-    public class CalciteRelationalCommand : RelationalCommand
+    public class CalciteCommand : RelationalCommand
     {
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         /// <param name="commandText"></param>
         /// <param name="logCommandText"></param>
         /// <param name="parameters"></param>
-        public CalciteRelationalCommand(RelationalCommandBuilderDependencies dependencies, string commandText, string logCommandText, IReadOnlyList<IRelationalParameter> parameters) :
+        public CalciteCommand(RelationalCommandBuilderDependencies dependencies, string commandText, string logCommandText, IReadOnlyList<IRelationalParameter> parameters) :
             base(dependencies, commandText, logCommandText, parameters)
         {
 

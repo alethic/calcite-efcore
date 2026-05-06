@@ -20,7 +20,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
         /// Initializes a new instance.
         /// </summary>
         public CalciteSByteTypeMapping() :
-            base(SqlTypeName.TINYINT.name())
+            base("TINYINT")
         {
 
         }

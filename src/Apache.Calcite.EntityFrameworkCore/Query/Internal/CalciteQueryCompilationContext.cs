@@ -27,8 +27,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
         /// <param name="dependencies"></param>
         /// <param name="relationalDependencies"></param>
         /// <param name="async"></param>
-        public CalciteQueryCompilationContext(QueryCompilationContextDependencies dependencies, RelationalQueryCompilationContextDependencies relationalDependencies, bool async)
-            : this(dependencies, relationalDependencies, async, precompiling: false)
+        public CalciteQueryCompilationContext(QueryCompilationContextDependencies dependencies, RelationalQueryCompilationContextDependencies relationalDependencies, bool async) :
+            this(dependencies, relationalDependencies, async, precompiling: false)
         {
 
         }

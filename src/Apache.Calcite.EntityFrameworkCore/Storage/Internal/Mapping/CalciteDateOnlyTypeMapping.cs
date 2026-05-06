@@ -22,7 +22,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
         /// Initializes a new instance.
         /// </summary>
         public CalciteDateOnlyTypeMapping() :
-            base(SqlTypeName.DATE.name())
+            base("DATE")
         {
 
         }

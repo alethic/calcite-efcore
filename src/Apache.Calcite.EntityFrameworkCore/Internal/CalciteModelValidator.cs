@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Microsoft.EntityFrameworkCore.Infrastructure;
+﻿using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Apache.Calcite.EntityFrameworkCore.Internal
 {
 
-    public class CalciteModelValidator :
-        RelationalModelValidator
+    public class CalciteModelValidator : RelationalModelValidator
     {
 
         /// <summary>

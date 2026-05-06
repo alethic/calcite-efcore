@@ -1,6 +1,7 @@
-﻿using Apache.Calcite.EntityFrameworkCore.Extensions;
+﻿using Apache.Calcite.EntityFrameworkCore.Design.Internal;
+using Apache.Calcite.EntityFrameworkCore.Extensions;
 
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,9 +18,16 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             var services = new ServiceCollection();
             services.AddEntityFrameworkCalcite();
 
+            new CalciteDesignTimeServices().ConfigureDesignTimeServices(services);
+
             return services
                 .BuildServiceProvider()
                 .GetRequiredService<IDatabaseModelFactory>();
+        }
+
+        public override void Clean(DatabaseFacade facade)
+        {
+            base.Clean(facade);
         }
 
     }

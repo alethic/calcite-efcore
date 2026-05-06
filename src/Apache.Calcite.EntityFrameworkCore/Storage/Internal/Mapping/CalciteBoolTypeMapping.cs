@@ -23,7 +23,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
         /// Initializes a new instance.
         /// </summary>
         public CalciteBoolTypeMapping() :
-            base(SqlTypeName.BOOLEAN.name())
+            base("BOOLEAN")
         {
 
         }

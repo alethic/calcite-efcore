@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Apache.Calcite.EntityFrameworkCore.Diagnostics;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal;
 
@@ -32,13 +33,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <returns>The options builder so that further configuration can be chained.</returns>
         public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
         {
-            ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(GetOrCreateExtension(optionsBuilder));
-
-            ConfigureWarnings(optionsBuilder);
-
-            calciteOptionsAction?.Invoke(new CalciteDbContextOptionsBuilder(optionsBuilder));
-
-            return optionsBuilder;
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
+            return ApplyConfiguration(optionsBuilder, calciteOptionsAction);
         }
 
         /// <summary>
@@ -50,14 +46,12 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <returns>The options builder so that further configuration can be chained.</returns>
         public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, string? connectionString, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
         {
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
+
             var extension = (CalciteOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnectionString(connectionString);
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 
-            ConfigureWarnings(optionsBuilder);
-
-            calciteOptionsAction?.Invoke(new CalciteDbContextOptionsBuilder(optionsBuilder));
-
-            return optionsBuilder;
+            return ApplyConfiguration(optionsBuilder, calciteOptionsAction);
         }
 
         /// <summary>
@@ -70,11 +64,12 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// state then EF will open and close the connection as needed. The caller owns the connection and is
         /// responsible for its disposal.
         /// </param>
-        /// <param name="sqliteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, JdbcConnection connection, Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
+        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, JdbcConnection connection, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
         {
-            return UseCalcite(optionsBuilder, connection, false, sqliteOptionsAction);
+            ArgumentNullException.ThrowIfNull(optionsBuilder);
+            return UseCalcite(optionsBuilder, connection, false, calciteOptionsAction);
         }
 
         /// <summary>
@@ -91,20 +86,16 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         ///     dispose it in the same way it would dispose a connection created by EF. If <see langword="false" />, then the caller still
         ///     owns the connection and is responsible for its disposal.
         /// </param>
-        /// <param name="sqliteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
+        /// <param name="calciteOptionsAction">An optional action to allow additional SQLite specific configuration.</param>
         /// <returns>The options builder so that further configuration can be chained.</returns>
-        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, JdbcConnection connection, bool contextOwnsConnection, Action<CalciteDbContextOptionsBuilder>? sqliteOptionsAction = null)
+        public static DbContextOptionsBuilder UseCalcite(this DbContextOptionsBuilder optionsBuilder, JdbcConnection connection, bool contextOwnsConnection, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction = null)
         {
             ArgumentNullException.ThrowIfNull(connection);
 
             var extension = (CalciteOptionsExtension)GetOrCreateExtension(optionsBuilder).WithConnection(connection, contextOwnsConnection);
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
 
-            ConfigureWarnings(optionsBuilder);
-
-            sqliteOptionsAction?.Invoke(new CalciteDbContextOptionsBuilder(optionsBuilder));
-
-            return optionsBuilder;
+            return ApplyConfiguration(optionsBuilder, calciteOptionsAction);
         }
 
         /// <summary>
@@ -186,12 +177,35 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         /// <summary>
         /// Gets the <see cref="CalciteOptionsExtension"/>.
         /// </summary>
-        /// <param name="options"></param>
+        /// <param name="optionsBuilder"></param>
         /// <returns></returns>
-        static CalciteOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder options)
-            => options.Options.FindExtension<CalciteOptionsExtension>()
+        static CalciteOptionsExtension GetOrCreateExtension(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.Options.FindExtension<CalciteOptionsExtension>()
                 ?? new CalciteOptionsExtension();
 
+        /// <summary>
+        /// Applies the standard configuration actions.
+        /// </summary>
+        /// <param name="optionsBuilder"></param>
+        /// <param name="calciteOptionsAction"></param>
+        /// <returns></returns>
+        static DbContextOptionsBuilder ApplyConfiguration(DbContextOptionsBuilder optionsBuilder, Action<CalciteDbContextOptionsBuilder>? calciteOptionsAction)
+        {
+            ConfigureWarnings(optionsBuilder);
+
+            calciteOptionsAction?.Invoke(new CalciteDbContextOptionsBuilder(optionsBuilder));
+            new CalciteDbContextOptionsBuilder(optionsBuilder).MaxBatchSize(1);
+
+            var extension = GetOrCreateExtension(optionsBuilder);
+            ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(extension);
+
+            return optionsBuilder;
+        }
+
+        /// <summary>
+        /// Configures the standard waning options.
+        /// </summary>
+        /// <param name="optionsBuilder"></param>
         static void ConfigureWarnings(DbContextOptionsBuilder optionsBuilder)
         {
             var coreOptionsExtension
@@ -199,7 +213,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                 ?? new CoreOptionsExtension();
 
             coreOptionsExtension = RelationalOptionsExtension.WithDefaultWarningConfiguration(coreOptionsExtension);
-
+            coreOptionsExtension = coreOptionsExtension.WithWarningsConfiguration(coreOptionsExtension.WarningsConfiguration.TryWithExplicit(CalciteEventId.TransactionIgnoredWarning, WarningBehavior.Log));
             ((IDbContextOptionsBuilderInfrastructure)optionsBuilder).AddOrUpdateExtension(coreOptionsExtension);
         }
 

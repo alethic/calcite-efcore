@@ -7,6 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="TestUtilities\Northwind.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="TestUtilities\Northwind.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Apache.Calcite.Extensions" Version="0.0.5" />
         <PackageReference Include="IKVM" Version="8.15.0" />
         <PackageReference Include="IKVM.Maven.Sdk" Version="1.11.0">
@@ -23,6 +31,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <MavenReference Include="org.apache.calcite:calcite-core" Version="1.41.0" />
+        <MavenReference Include="org.apache.calcite:calcite-server" Version="1.41.0" />
         <MavenReference Include="org.apache.calcite.avatica:avatica-core" Version="1.27.0" />
     </ItemGroup>
 
@@ -34,10 +44,6 @@
         <None Update="northwind.db">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="ReflectiveSchema\" />
     </ItemGroup>
 
 </Project>

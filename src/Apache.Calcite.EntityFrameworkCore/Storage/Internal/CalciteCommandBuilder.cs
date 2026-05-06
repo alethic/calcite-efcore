@@ -30,7 +30,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         {
             var commandText = _commandTextBuilder.ToString();
             var logCommandText = _logCommandTextBuilder?.ToString() ?? commandText;
-            return new CalciteRelationalCommand(Dependencies, commandText, logCommandText, Parameters);
+            return new CalciteCommand(Dependencies, commandText, logCommandText, Parameters);
         }
 
         /// <summary>

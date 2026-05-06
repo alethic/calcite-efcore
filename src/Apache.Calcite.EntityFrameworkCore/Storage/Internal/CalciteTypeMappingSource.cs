@@ -5,8 +5,6 @@ using Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping;
 
 using Microsoft.EntityFrameworkCore.Storage;
 
-using org.apache.calcite.sql.type;
-
 namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 {
 
@@ -38,21 +36,21 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 
         static readonly Dictionary<string, RelationalTypeMapping[]> _storeTypeMappings = new(StringComparer.OrdinalIgnoreCase)
         {
-            [SqlTypeName.BOOLEAN.name()] = [CalciteBoolTypeMapping.Default],
-            [SqlTypeName.TINYINT.name()] = [CalciteByteTypeMapping.Default],
-            [SqlTypeName.CHAR.name()] = [CalciteCharTypeMapping.Default],
-            [SqlTypeName.SMALLINT.name()] = [CalciteShortTypeMapping.Default],
-            [SqlTypeName.INTEGER.name()] = [CalciteIntTypeMapping.Default],
-            [SqlTypeName.BIGINT.name()] = [CalciteLongTypeMapping.Default],
-            [SqlTypeName.FLOAT.name()] = [CalciteFloatTypeMapping.Default],
-            [SqlTypeName.DOUBLE.name()] = [CalciteDoubleTypeMapping.Default],
-            [SqlTypeName.DECIMAL.name()] = [CalciteDecimalTypeMapping.Default],
-            [SqlTypeName.DATE.name()] = [CalciteDateOnlyTypeMapping.Default],
-            [SqlTypeName.TIME.name()] = [CalciteTimeOnlyTypeMapping.Default],
-            [SqlTypeName.TIMESTAMP.name()] = [CalciteDateTimeTypeMapping.Default],
-            [SqlTypeName.TIMESTAMP_TZ.name()] = [CalciteDateTimeOffsetTypeMapping.Default],
-            [SqlTypeName.VARCHAR.name()] = [CalciteStringTypeMapping.Default],
-            [SqlTypeName.VARBINARY.name()] = [CalciteByteArrayTypeMapping.Default],
+            ["BOOLEAN"] = [CalciteBoolTypeMapping.Default],
+            ["TINYINT UNSIGNED"] = [CalciteByteTypeMapping.Default],
+            ["CHAR(1)"] = [CalciteCharTypeMapping.Default],
+            ["SMALLINT"] = [CalciteShortTypeMapping.Default],
+            ["INTEGER"] = [CalciteIntTypeMapping.Default],
+            ["BIGINT"] = [CalciteLongTypeMapping.Default],
+            ["REAL"] = [CalciteFloatTypeMapping.Default],
+            ["DOUBLE"] = [CalciteDoubleTypeMapping.Default],
+            ["DECIMAL"] = [CalciteDecimalTypeMapping.Default],
+            ["DATE"] = [CalciteDateOnlyTypeMapping.Default],
+            ["TIME"] = [CalciteTimeOnlyTypeMapping.Default],
+            ["TIMESTAMP"] = [CalciteDateTimeTypeMapping.Default],
+            ["TIMESTAMP WITH TIME ZONE"] = [CalciteDateTimeOffsetTypeMapping.Default],
+            ["VARCHAR"] = [CalciteStringTypeMapping.Default],
+            ["VARBINARY"] = [CalciteByteArrayTypeMapping.Default],
         };
 
         /// <summary>

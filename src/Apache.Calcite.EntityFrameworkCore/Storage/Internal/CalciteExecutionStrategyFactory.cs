@@ -10,7 +10,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         /// Initializes a new instance.
         /// </summary>
         /// <param name="dependencies"></param>
-        public CalciteExecutionStrategyFactory(ExecutionStrategyDependencies dependencies) : base(dependencies)
+        public CalciteExecutionStrategyFactory(ExecutionStrategyDependencies dependencies) :
+            base(dependencies)
         {
 
         }

@@ -69,7 +69,19 @@ namespace Apache.Calcite.EntityFrameworkCore.Metadata.Conventions
         public override ConventionSet CreateConventionSet()
         {
             var conventionSet = base.CreateConventionSet();
+
+            conventionSet.Add(new CalciteValueGenerationStrategyConvention(Dependencies, RelationalDependencies));
+
+            conventionSet.Replace<StoreGenerationConvention>(new CalciteStoreGenerationConvention(Dependencies, RelationalDependencies));
+            conventionSet.Replace<ValueGenerationConvention>(new CalciteValueGenerationConvention(Dependencies, RelationalDependencies));
             conventionSet.Replace<QueryFilterRewritingConvention>(new CalciteQueryFilterRewritingConvention(Dependencies, RelationalDependencies));
+
+            // indexes not supported so remove conventions that might add indexes
+            conventionSet.Remove(typeof(ForeignKeyIndexConvention));
+            conventionSet.Remove(typeof(IndexAttributeConvention));
+
+            conventionSet.Add(new CalciteIndexesNotSupportedConvention());
+
             return conventionSet;
         }
 

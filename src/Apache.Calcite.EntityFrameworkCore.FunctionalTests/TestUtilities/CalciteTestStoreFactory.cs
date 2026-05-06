@@ -20,10 +20,10 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         }
 
         /// <inheritdoc/>
-        public override TestStore Create(string storeName) => ReflectiveSchemaNorthwindTestStore.Create(storeName);
+        public override TestStore Create(string storeName) => CalciteTestStore.Create(storeName);
 
         /// <inheritdoc/>
-        public override TestStore GetOrCreate(string storeName) => ReflectiveSchemaNorthwindTestStore.GetOrCreate(storeName);
+        public override TestStore GetOrCreate(string storeName) => CalciteTestStore.GetOrCreate(storeName);
 
         /// <inheritdoc/>
         public override IServiceCollection AddProviderServices(IServiceCollection serviceCollection) => serviceCollection.AddEntityFrameworkCalcite();

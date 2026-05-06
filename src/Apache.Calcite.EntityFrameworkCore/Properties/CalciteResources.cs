@@ -2,6 +2,8 @@
 using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
 using Apache.Calcite.EntityFrameworkCore.Internal;
 
+using IKVM.Jdbc.Data;
+
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -12,13 +14,14 @@ namespace Apache.Calcite.EntityFrameworkCore.Properties
     {
 
         /// <summary>
-        ///     The entity type '{entityType}' has composite key '{key}' which is configured to use generated values. SQLite does not support generated values on composite keys.
+        /// An ADO.NET Connection object other than <see cref="JdbcConnection"/> was passed.
         /// </summary>
+        /// <param name="logger"></param>
+        /// <returns></returns>
         public static EventDefinition<string> LogUnexpectedConnectionType(IDiagnosticsLogger logger)
         {
             var definition = ((CalciteLoggingDefinitions)logger.Definitions).LogUnexpectedConnectionType;
             if (definition == null)
-            {
                 definition = NonCapturingLazyInitializer.EnsureInitialized(
                     ref ((CalciteLoggingDefinitions)logger.Definitions).LogUnexpectedConnectionType,
                     logger,
@@ -31,9 +34,31 @@ namespace Apache.Calcite.EntityFrameworkCore.Properties
                             level,
                             CalciteEventId.UnexpectedConnectionTypeWarning,
                             CalciteStrings.LogUnexpectedConnectionType)));
-            }
 
             return (EventDefinition<string>)definition;
+        }
+
+        /// <summary>
+        /// Transactions are not supported by the Calcite store.
+        /// </summary>
+        public static EventDefinition LogTransactionsNotSupported(IDiagnosticsLogger logger)
+        {
+            var definition = ((CalciteLoggingDefinitions)logger.Definitions).LogTransactionsNotSupported;
+            if (definition == null)
+                definition = NonCapturingLazyInitializer.EnsureInitialized(
+                    ref ((CalciteLoggingDefinitions)logger.Definitions).LogTransactionsNotSupported,
+                    logger,
+                    static logger => new EventDefinition(
+                        logger.Options,
+                        CalciteEventId.TransactionIgnoredWarning,
+                        LogLevel.Warning,
+                        "CalciteEventId.TransactionIgnoredWarning",
+                        level => LoggerMessage.Define(
+                            level,
+                            CalciteEventId.TransactionIgnoredWarning,
+                            CalciteStrings.LogTransactionsNotSupported)));
+
+            return (EventDefinition)definition;
         }
 
     }

@@ -20,7 +20,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal.Mapping
         /// Initializes a new instance.
         /// </summary>
         public CalciteByteArrayTypeMapping() :
-            base(SqlTypeName.VARBINARY.name(), System.Data.DbType.Binary)
+            base("VARBINARY", System.Data.DbType.Binary)
         {
 
         }

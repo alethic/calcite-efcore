@@ -5,21 +5,26 @@ using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal;
 using Apache.Calcite.EntityFrameworkCore.Internal;
+using Apache.Calcite.EntityFrameworkCore.Metadata;
 using Apache.Calcite.EntityFrameworkCore.Metadata.Conventions;
-using Apache.Calcite.EntityFrameworkCore.Metadata.Internal;
+using Apache.Calcite.EntityFrameworkCore.Migrations;
+using Apache.Calcite.EntityFrameworkCore.Migrations.Internal;
 using Apache.Calcite.EntityFrameworkCore.Query.Internal;
 using Apache.Calcite.EntityFrameworkCore.Storage.Internal;
-using Apache.Calcite.EntityFrameworkCore.Update.Internal;
-using Apache.Calcite.EntityFrameworkCore.ValueGeneration.Internal;
+using Apache.Calcite.EntityFrameworkCore.Update;
+using Apache.Calcite.EntityFrameworkCore.ValueGeneration;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations.Internal;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Update;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -104,15 +109,15 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                 .TryAdd<IDatabaseProvider, DatabaseProvider<CalciteOptionsExtension>>()
                 .TryAdd<IRelationalTypeMappingSource, CalciteTypeMappingSource>()
                 .TryAdd<ISqlGenerationHelper, CalciteSqlGenerationHelper>()
-                .TryAdd<IRelationalAnnotationProvider, CalciteAnnotationProvider>()
+                .TryAdd<IRelationalAnnotationProvider,RelationalAnnotationProvider>()
                 .TryAdd<IModelValidator, CalciteModelValidator>()
                 .TryAdd<IProviderConventionSetBuilder, CalciteConventionSetBuilder>()
-                .TryAdd<IUpdateSqlGenerator>(p => p.GetRequiredService<ICalciteUpdateSqlGenerator>())
+                .TryAdd<IUpdateSqlGenerator, CalciteUpdateSqlGenerator>()
                 .TryAdd<IModificationCommandBatchFactory, CalciteModificationCommandBatchFactory>()
                 .TryAdd<IValueGeneratorSelector, CalciteValueGeneratorSelector>()
-                .TryAdd<IRelationalConnection>(p => p.GetRequiredService<ICalciteRelationalConnection>())
+                .TryAdd<IRelationalConnection>(p => p.GetRequiredService<ICalciteConnection>())
                 .TryAdd<ICompiledQueryCacheKeyGenerator, CalciteCompiledQueryCacheKeyGenerator>()
-                .TryAdd<IModificationCommandFactory, CalciteModificationCommandFactory>()
+                .TryAdd<IModificationCommandFactory, ModificationCommandFactory>()
                 .TryAdd<IExecutionStrategyFactory, CalciteExecutionStrategyFactory>()
                 .TryAdd<ISingletonOptions, ICalciteOptions>(p => p.GetRequiredService<ICalciteOptions>())
                 .TryAdd<IQueryCompilationContextFactory, CalciteQueryCompilationContextFactory>()
@@ -123,15 +128,20 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                 .TryAdd<IRelationalSqlTranslatingExpressionVisitorFactory, CalciteSqlTranslatingExpressionVisitorFactory>()
                 .TryAdd<ISqlExpressionFactory, CalciteSqlExpressionFactory>()
                 .TryAdd<IQueryTranslationPostprocessorFactory, CalciteQueryTranslationPostprocessorFactory>()
-                .TryAdd<IRelationalTransactionFactory, CalciteTransactionFactory>()
                 .TryAdd<IRelationalParameterBasedSqlProcessorFactory, CalciteParameterBasedSqlProcessorFactory>()
                 .TryAdd<IQueryableMethodTranslatingExpressionVisitorFactory, CalciteQueryableMethodTranslatingExpressionVisitorFactory>()
                 .TryAdd<IRelationalCommandBuilderFactory, CalciteRelationalCommandBuilderFactory>()
                 .TryAdd<IRelationalDatabaseCreator, CalciteDatabaseCreator>()
+                .TryAdd<IMigrationsSqlGenerator, CalciteMigrationsSqlGenerator>()
+                .TryAdd<IMigrationCommandExecutor, CalciteMigrationCommandExecutor>()
+                .TryAdd<IMigrationsAnnotationProvider, MigrationsAnnotationProvider>()
+                .TryAdd<IValueGeneratorCache>(p => p.GetRequiredService<ICalciteValueGeneratorCache>())
+                .TryAdd<IMigrationsModelDiffer, MigrationsModelDiffer>()
                 .TryAddProviderSpecificServices(b => b
                     .TryAddSingleton<ICalciteOptions, CalciteOptions>()
-                    .TryAddSingleton<ICalciteUpdateSqlGenerator, CalciteUpdateSqlGenerator>()
-                    .TryAddScoped<ICalciteRelationalConnection, CalciteRelationalConnection>())
+                    .TryAddSingleton<ICalciteValueGeneratorCache, CalciteValueGeneratorCache>()
+                    .TryAddSingleton<ICalciteSequenceValueGeneratorFactory, CalciteSequenceValueGeneratorFactory>()
+                    .TryAddScoped<ICalciteConnection, CalciteRelationalConnection>())
                 .TryAddCoreServices();
 
             return serviceCollection;
