@@ -10,21 +10,47 @@ using Microsoft.EntityFrameworkCore.Metadata;
 namespace Apache.Calcite.EntityFrameworkCore.Metadata.Internal
 {
 
+    /// <summary>
+    /// Calcite implementation of an entity-backed sequence used as a HiLo value generator source.
+    /// Stores sequence configuration in model-level annotations and exposes both read-only and mutable
+    /// surfaces of the metadata.
+    /// </summary>
     public class CalciteEntitySequence : ConventionAnnotatable, ICalciteMutableEntitySequence, ICalciteEntitySequence
     {
 
+        /// <summary>
+        /// CLR types supported as the value type of an entity sequence.
+        /// </summary>
         public static IReadOnlyCollection<Type> SupportedTypes { get; } = [typeof(byte), typeof(long), typeof(int), typeof(short), typeof(decimal)];
 
+        /// <summary>
+        /// The default CLR type used for sequence values when none is explicitly specified.
+        /// </summary>
         public static readonly Type DefaultClrType = typeof(long);
 
+        /// <summary>
+        /// The default amount by which the sequence is incremented when generating each new value.
+        /// </summary>
         public const int DefaultIncrementBy = 1;
 
+        /// <summary>
+        /// The default starting value used when seeding a new sequence row.
+        /// </summary>
         public const int DefaultStartValue = 1;
 
+        /// <summary>
+        /// The default maximum value for the sequence; <see langword="null"/> means unbounded.
+        /// </summary>
         public static readonly long? DefaultMaxValue = default;
 
+        /// <summary>
+        /// The default minimum value for the sequence; <see langword="null"/> means unbounded.
+        /// </summary>
         public static readonly long? DefaultMinValue = default;
 
+        /// <summary>
+        /// Indicates whether the sequence is cyclic by default.
+        /// </summary>
         public static readonly bool DefaultIsCyclic = default;
 
         int? _incrementBy;

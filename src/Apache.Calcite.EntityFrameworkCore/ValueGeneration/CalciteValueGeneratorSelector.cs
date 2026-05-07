@@ -14,6 +14,11 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 namespace Apache.Calcite.EntityFrameworkCore.ValueGeneration
 {
 
+    /// <summary>
+    /// Calcite-specific <see cref="IValueGeneratorSelector"/> that prefers entity-sequence HiLo generators for
+    /// properties configured with <see cref="CalciteValueGenerationStrategy.EntitySequenceHiLo"/> and otherwise
+    /// falls back to the relational defaults, with special handling for <see cref="Guid"/> properties.
+    /// </summary>
     public class CalciteValueGeneratorSelector : RelationalValueGeneratorSelector
     {
 
@@ -22,12 +27,12 @@ namespace Apache.Calcite.EntityFrameworkCore.ValueGeneration
         readonly IRelationalCommandDiagnosticsLogger _commandLogger;
 
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="CalciteValueGeneratorSelector"/> class.
         /// </summary>
-        /// <param name="dependencies"></param>
-        /// <param name="sequenceFactory"></param>
-        /// <param name="connection"></param>
-        /// <param name="commandLogger"></param>
+        /// <param name="dependencies">The base selector dependencies.</param>
+        /// <param name="sequenceFactory">The factory used to create entity sequence value generators.</param>
+        /// <param name="connection">The Calcite relational connection used to scope cached generator state.</param>
+        /// <param name="commandLogger">The diagnostics logger used by command execution within generators.</param>
         public CalciteValueGeneratorSelector(ValueGeneratorSelectorDependencies dependencies, ICalciteSequenceValueGeneratorFactory sequenceFactory, ICalciteConnection connection, IRelationalCommandDiagnosticsLogger commandLogger) :
             base(dependencies)
         {
@@ -36,6 +41,9 @@ namespace Apache.Calcite.EntityFrameworkCore.ValueGeneration
             _commandLogger = commandLogger;
         }
 
+        /// <summary>
+        /// Gets the Calcite-specific value generator cache used by this selector.
+        /// </summary>
         public new virtual ICalciteValueGeneratorCache Cache => (ICalciteValueGeneratorCache)base.Cache;
 
         /// <inheritdoc />
