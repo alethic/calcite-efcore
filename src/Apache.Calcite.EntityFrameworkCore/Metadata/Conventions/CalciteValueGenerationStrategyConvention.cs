@@ -137,17 +137,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Metadata.Conventions
                 valueProp,
                 ConfigurationSource.Convention);
 
-            sequence.EntityFilter = BuildNameFilter(backingType, nameProp.Name, sequenceName);
-        }
-
-        static System.Linq.Expressions.LambdaExpression BuildNameFilter(System.Type entityClrType, string namePropertyName, string sequenceName)
-        {
-            var parameter = System.Linq.Expressions.Expression.Parameter(entityClrType, "e");
-            var member = System.Linq.Expressions.Expression.PropertyOrField(parameter, namePropertyName);
-            var constant = System.Linq.Expressions.Expression.Constant(sequenceName, typeof(string));
-            var equal = System.Linq.Expressions.Expression.Equal(member, constant);
-            var delegateType = typeof(System.Func<,>).MakeGenericType(entityClrType, typeof(bool));
-            return System.Linq.Expressions.Expression.Lambda(delegateType, equal, parameter);
+            sequence.KeyValue = sequenceName;
         }
 
         bool IsStrategyNoneNeeded(IReadOnlyProperty property, StoreObjectIdentifier storeObject)

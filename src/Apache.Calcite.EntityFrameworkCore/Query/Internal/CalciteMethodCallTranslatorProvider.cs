@@ -14,7 +14,10 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
             base(dependencies)
         {
             var sqlExpressionFactory = (CalciteSqlExpressionFactory)dependencies.SqlExpressionFactory;
-            AddTranslators([]);
+            AddTranslators(
+            [
+                new CalciteStringMethodTranslator(sqlExpressionFactory),
+            ]);
         }
 
     }

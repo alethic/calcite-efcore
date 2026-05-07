@@ -110,16 +110,35 @@ namespace Apache.Calcite.EntityFrameworkCore.ValueGeneration
         }
 
         /// <summary>
-        /// Builds an <see cref="IQueryable{TEntity}"/> filtered to the sequence row.
+        /// Builds an <see cref="IQueryable{TEntity}"/> filtered to the sequence row by its primary key value.
         /// </summary>
         private IQueryable<TEntity> BuildFilteredQuery<TEntity>(DbContext context) where TEntity : class
         {
             IQueryable<TEntity> query = context.Set<TEntity>();
 
-            if (_sequence.EntityFilter is Expression<Func<TEntity, bool>> filter)
-                query = query.Where(filter);
+            if (_sequence.KeyValue is { } keyValue)
+                query = query.Where(BuildKeyEqualsExpression<TEntity>(keyValue));
 
             return query;
+        }
+
+        /// <summary>
+        /// Builds <c>e =&gt; e.&lt;PrimaryKeyProperty&gt; == keyValue</c>.
+        /// </summary>
+        private Expression<Func<TEntity, bool>> BuildKeyEqualsExpression<TEntity>(object keyValue)
+        {
+            var keyProperty = _sequence.EntityType.FindPrimaryKey()?.Properties.Single()
+                ?? throw new InvalidOperationException(
+                    $"Entity sequence backing entity '{_sequence.EntityType.DisplayName()}' must have a single primary key property.");
+
+            var clrProperty = typeof(TEntity).GetProperty(keyProperty.Name)
+                ?? throw new InvalidOperationException(
+                    $"Property '{keyProperty.Name}' was not found on '{typeof(TEntity)}'.");
+
+            var parameter = Expression.Parameter(typeof(TEntity), "e");
+            var member = Expression.MakeMemberAccess(parameter, clrProperty);
+            var constant = Expression.Constant(keyValue, clrProperty.PropertyType);
+            return Expression.Lambda<Func<TEntity, bool>>(Expression.Equal(member, constant), parameter);
         }
 
         /// <summary>

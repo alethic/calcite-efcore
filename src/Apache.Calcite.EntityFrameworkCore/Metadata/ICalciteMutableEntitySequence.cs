@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Apache.Calcite.EntityFrameworkCore.Metadata
 {
@@ -19,9 +17,9 @@ namespace Apache.Calcite.EntityFrameworkCore.Metadata
         new IReadOnlyEntityType EntityType { get; set; }
 
         /// <summary>
-        /// Gets the filter expression use to select the row in the table that represents the sequence.
+        /// Gets or sets the value of the entity's primary key that identifies the row representing this sequence.
         /// </summary>
-        new LambdaExpression EntityFilter { get; set; }
+        new object? KeyValue { get; set; }
 
         /// <summary>
         /// Gets or sets the value property associated with this instance.

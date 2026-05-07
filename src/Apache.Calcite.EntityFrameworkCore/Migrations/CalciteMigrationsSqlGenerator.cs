@@ -52,6 +52,24 @@ namespace Apache.Calcite.EntityFrameworkCore.Migrations
             throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Generates DDL for an <see cref="EnsureSchemaOperation"/>. Calcite's
+        /// <c>ServerDdlExecutor</c> supports <c>CREATE SCHEMA IF NOT EXISTS</c>, which is the
+        /// natural translation of EF Core's "ensure schema" semantics: create the schema if it
+        /// does not yet exist, otherwise leave the existing one untouched.
+        /// </summary>
+        protected override void Generate(EnsureSchemaOperation operation, IModel? model, MigrationCommandListBuilder builder)
+        {
+            ArgumentNullException.ThrowIfNull(operation);
+            ArgumentNullException.ThrowIfNull(builder);
+
+            builder
+                .Append("CREATE SCHEMA IF NOT EXISTS ")
+                .Append(Dependencies.SqlGenerationHelper.DelimitIdentifier(operation.Name));
+
+            EndStatement(builder);
+        }
+
         /// <inheritdoc />
         protected override void Generate(CreateIndexOperation operation, IModel? model, MigrationCommandListBuilder builder, bool terminate = true)
         {

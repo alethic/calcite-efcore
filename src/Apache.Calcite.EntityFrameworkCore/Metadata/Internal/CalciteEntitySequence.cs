@@ -160,9 +160,9 @@ namespace Apache.Calcite.EntityFrameworkCore.Metadata.Internal
         public virtual IReadOnlyEntityType EntityType { get; set; }
 
         /// <summary>
-        /// Gets the filter applied to the entity to locate the row that represents the sequence.
+        /// Gets or sets the value of the entity's primary key that identifies the row representing this sequence.
         /// </summary>
-        public virtual LambdaExpression? EntityFilter { get; set; }
+        public virtual object? KeyValue { get; set; }
 
         /// <summary>
         /// Gets the property that holds the sequence value.

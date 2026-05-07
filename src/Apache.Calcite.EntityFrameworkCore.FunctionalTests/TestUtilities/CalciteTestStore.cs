@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Apache.Calcite.Data;
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 
 using ikvm.runtime;
@@ -47,6 +46,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         {
             Startup.addBootClassPathAssembly(typeof(org.apache.calcite.jdbc.Driver).Assembly);
             Startup.addBootClassPathAssembly(typeof(org.apache.calcite.server.ServerDdlExecutor).Assembly);
+            Startup.addBootClassPathAssembly(typeof(org.joou.ULong).Assembly);
 
             CalciteJdbcDriver = (org.apache.calcite.jdbc.Driver)DriverManager.getDriver("jdbc:calcite:");
             CalciteJdbc41Factory = new CalciteJdbc41Factory();
@@ -79,12 +79,9 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         static CalciteStoreInstance CreateStoreInstance(string name)
         {
             var properties = new java.util.Properties();
-            new CalciteConnectionProperties(properties)
-            {
-                Schema = name,
-                Conformance = SqlConformanceEnum.LENIENT,
-                ParserFactory = "org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY"
-            };
+            properties.setProperty("schema", name);
+            properties.setProperty("conformance", SqlConformanceEnum.LENIENT.name());
+            properties.setProperty("parserFactory", "org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY");
 
             using var tmpConnection = DriverManager.getConnection("jdbc:calcite:");
             var tmpCalciteConnection = (CalciteConnection)tmpConnection.unwrap(typeof(CalciteConnection));
@@ -173,8 +170,6 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             }
 
             await CleanAsync(context);
-
-            await context.Database.EnsureCreatedResilientlyAsync();
 
             if (seed != null)
             {

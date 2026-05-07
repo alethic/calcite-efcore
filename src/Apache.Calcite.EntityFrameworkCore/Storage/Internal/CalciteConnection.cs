@@ -1,5 +1,8 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -8,6 +11,8 @@ using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
 using Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal;
 
 using IKVM.Jdbc.Data;
+
+using java.lang;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -27,8 +32,14 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         /// </summary>
         static CalciteRelationalConnection()
         {
-            java.lang.Class.forName("org.apache.calcite.jdbc.Driver");
-            java.lang.Class.forName("org.apache.calcite.server.ServerDdlExecutor");
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.jdbc.Driver).Assembly);
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.server.ServerDdlExecutor).Assembly);
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.joou.ULong).Assembly);
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.linq4j.tree.BlockBuilder).Assembly);
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.linq4j.tree.OptimizeShuttle).Assembly);
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(com.google.common.@base.Preconditions).Assembly);
+            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.avatica.util.Spacer).Assembly);
+            RuntimeHelpers.RunClassConstructor(typeof(org.apache.calcite.linq4j.tree.OptimizeShuttle).TypeHandle);
         }
 
         readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
@@ -97,7 +108,19 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         }
 
         /// <inheritdoc/>
+        public override IDbContextTransaction BeginTransaction(System.Data.IsolationLevel isolationLevel)
+        {
+            return BeginTransaction();
+        }
+
+        /// <inheritdoc/>
         public override Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(BeginTransaction());
+        }
+
+        /// <inheritdoc/>
+        public override Task<IDbContextTransaction> BeginTransactionAsync(System.Data.IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(BeginTransaction());
         }

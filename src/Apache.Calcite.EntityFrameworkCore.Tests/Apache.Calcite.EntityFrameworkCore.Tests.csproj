@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Apache.Calcite.Extensions" Version="0.0.5" />
         <PackageReference Include="IKVM" Version="8.15.0" />
         <PackageReference Include="IKVM.Maven.Sdk" Version="1.11.0">
             <PrivateAssets>all</PrivateAssets>
@@ -20,8 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <MavenReference Include="org.apache.calcite:calcite-csv" Version="1.41.0" />
-        <MavenReference Include="org.apache.calcite.avatica:avatica" Version="1.27.0" />
+        <MavenReference Include="@(CalciteDependency)" />
+        <IkvmReference Include="@(CalciteIkvmReference)" />
+        <IkvmReference Include="..\..\ext\calcite-csv-$(CalciteVersion)-SNAPSHOT.jar" References="$(CalciteReferences);..\..\ext\calcite-linq4j-$(CalciteVersion)-SNAPSHOT.jar;..\..\ext\calcite-core-$(CalciteVersion)-SNAPSHOT.jar" />
     </ItemGroup>
 
     <ItemGroup>

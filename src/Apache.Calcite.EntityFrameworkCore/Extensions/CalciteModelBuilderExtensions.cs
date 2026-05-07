@@ -86,20 +86,10 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
                     entityType,
                     entityType.FindProperty(valueProp)!,
                     ConfigurationSource.Explicit);
-                sequence.EntityFilter = BuildNameFilter(entityClrType, nameProp, name);
+                sequence.KeyValue = name;
             }
 
             return modelBuilder;
-        }
-
-        static LambdaExpression BuildNameFilter(System.Type entityClrType, string namePropertyName, string sequenceName)
-        {
-            var parameter = Expression.Parameter(entityClrType, "e");
-            var member = Expression.PropertyOrField(parameter, namePropertyName);
-            var constant = Expression.Constant(sequenceName, typeof(string));
-            var equal = Expression.Equal(member, constant);
-            var delegateType = typeof(Func<,>).MakeGenericType(entityClrType, typeof(bool));
-            return Expression.Lambda(delegateType, equal, parameter);
         }
 
         /// <summary>

@@ -43,7 +43,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Update
 
             return readOperations.Count > 0
                 ? ResultSetMapping.LastInResultSet
-                : ResultSetMapping.LastInResultSet | ResultSetMapping.NoResults;
+                : ResultSetMapping.NoResults;
         }
 
         /// <inheritdoc/>

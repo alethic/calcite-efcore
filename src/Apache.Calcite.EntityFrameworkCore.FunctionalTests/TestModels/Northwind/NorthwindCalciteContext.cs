@@ -22,6 +22,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestModels.Northwin
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.HasDefaultSchema("Northwind");
             modelBuilder.UseHiLoEntitySequence();
             modelBuilder.Entity<Employee>().Property(p => p.LastName).IsRequired(true);
             modelBuilder.Entity<CustomerQuery>().ToSqlQuery(@"SELECT ""c"".""CustomerID"", ""c"".""Address"", ""c"".""City"", ""c"".""CompanyName"", ""c"".""ContactName"", ""c"".""ContactTitle"", ""c"".""Country"", ""c"".""Fax"", ""c"".""Phone"", ""c"".""PostalCode"", ""c"".""Region"" FROM ""Customers"" AS ""c""");

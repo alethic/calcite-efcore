@@ -21,9 +21,8 @@
     </ItemGroup>
     
     <ItemGroup>
-        <MavenReference Include="org.apache.calcite:calcite-core" Version="1.41.0" />
-        <MavenReference Include="org.apache.calcite:calcite-server" Version="1.41.0" />
-        <MavenReference Include="org.apache.calcite.avatica:avatica-core" Version="1.27.0" />
+        <MavenReference Include="@(CalciteDependency)" />
+        <IkvmReference Include="@(CalciteIkvmReference)" />
     </ItemGroup>
 
     <ItemGroup>
