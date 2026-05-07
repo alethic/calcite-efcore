@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -8,20 +9,25 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 namespace Apache.Calcite.EntityFrameworkCore.ValueGeneration
 {
 
+    /// <summary>
+    /// Default implementation of <see cref="ICalciteSequenceValueGeneratorFactory"/> that creates a
+    /// <see cref="CalciteEntitySequenceHiLoValueGenerator{TValue}"/> for the supported integral and decimal CLR types.
+    /// </summary>
     public class CalciteSequenceValueGeneratorFactory : ICalciteSequenceValueGeneratorFactory
     {
 
         readonly ICurrentDbContext _currentDbContext;
 
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="CalciteSequenceValueGeneratorFactory"/> class.
         /// </summary>
-        /// <param name="currentDbContext"></param>
+        /// <param name="currentDbContext">The current <see cref="DbContext"/> accessor used by generated value generators.</param>
         public CalciteSequenceValueGeneratorFactory(ICurrentDbContext currentDbContext)
         {
             _currentDbContext = currentDbContext;
         }
 
+        /// <inheritdoc />
         public virtual ValueGenerator? TryCreate(IProperty property, Type type, CalciteEntitySequenceGeneratorState generatorState, IRelationalCommandDiagnosticsLogger commandLogger)
         {
             if (type == typeof(long))

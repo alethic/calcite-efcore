@@ -14,21 +14,34 @@ using Microsoft.EntityFrameworkCore.ValueGeneration;
 namespace Apache.Calcite.EntityFrameworkCore.ValueGeneration
 {
 
+    /// <summary>
+    /// Caches <see cref="CalciteEntitySequenceGeneratorState"/> instances keyed by entity sequence and connection,
+    /// extending the standard EF Core <see cref="ValueGeneratorCache"/> with Calcite-specific sequence support.
+    /// </summary>
     public class CalciteValueGeneratorCache : ValueGeneratorCache, ICalciteValueGeneratorCache
     {
 
         readonly ConcurrentDictionary<string, CalciteEntitySequenceGeneratorState> _cache = new();
 
         /// <summary>
-        /// Initializes a new instance.
+        /// Initializes a new instance of the <see cref="CalciteValueGeneratorCache"/> class.
         /// </summary>
-        /// <param name="dependencies"></param>
+        /// <param name="dependencies">The dependencies required by the base <see cref="ValueGeneratorCache"/>.</param>
         public CalciteValueGeneratorCache(ValueGeneratorCacheDependencies dependencies) :
             base(dependencies)
         {
 
         }
 
+        /// <summary>
+        /// Gets the cached <see cref="CalciteEntitySequenceGeneratorState"/> for the entity sequence associated with
+        /// the specified <paramref name="property"/> and <paramref name="connection"/>, creating and caching a new
+        /// instance if one does not already exist.
+        /// </summary>
+        /// <param name="property">The property whose entity sequence state is being retrieved.</param>
+        /// <param name="connection">The relational connection used to scope the cached state.</param>
+        /// <returns>The cached or newly created <see cref="CalciteEntitySequenceGeneratorState"/>.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when no entity sequence is configured for the property.</exception>
         public virtual CalciteEntitySequenceGeneratorState GetOrAddEntitySequenceState(IReadOnlyProperty property, IRelationalConnection connection)
         {
             var tableIdentifier = StoreObjectIdentifier.Create(property.DeclaringType, StoreObjectType.Table);
