@@ -21,6 +21,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
         {
 
         }
+
         /// <inheritdoc/>
         protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
