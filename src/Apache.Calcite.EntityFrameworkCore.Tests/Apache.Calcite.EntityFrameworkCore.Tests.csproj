@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSTest.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -7,21 +7,31 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="TestUtilities\Northwind.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="TestUtilities\Northwind.sql" />
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="IKVM" Version="8.15.0" />
         <PackageReference Include="IKVM.Maven.Sdk" Version="1.11.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="IKVM.Jdbc.Data" Version="1.0.14-pre.31" />
-        <PackageReference Include="FluentAssertions" Version="8.8.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational.Specification.Tests" Version="10.0.2" />
-        <PackageReference Include="Spectre.Console" Version="0.54.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
         <MavenReference Include="@(CalciteDependency)" />
         <IkvmReference Include="@(CalciteIkvmReference)" />
-        <IkvmReference Include="..\..\ext\calcite-csv-$(CalciteVersion)-SNAPSHOT.jar" References="$(CalciteReferences);..\..\ext\calcite-linq4j-$(CalciteVersion)-SNAPSHOT.jar;..\..\ext\calcite-core-$(CalciteVersion)-SNAPSHOT.jar" />
     </ItemGroup>
 
     <ItemGroup>
@@ -29,16 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Csv\model.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Csv\sales\DEPTS.csv">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Csv\sales\EMPS.csv.gz">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        <None Update="Csv\sales\SDEPTS.csv">
+        <None Update="northwind.db">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
