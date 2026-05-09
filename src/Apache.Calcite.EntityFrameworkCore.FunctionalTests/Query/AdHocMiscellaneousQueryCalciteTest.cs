@@ -30,14 +30,10 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
             return optionsBuilder;
         }
 
-        protected override Task Seed2951(Context2951 context)
+        protected override async Task Seed2951(Context2951 context)
         {
-            throw new System.NotImplementedException();
-        }
-
-        class Context24657
-        {
-
+            await context.Database.ExecuteSqlRawAsync("CREATE TABLE ZeroKey (Id INT)");
+            await context.Database.ExecuteSqlRawAsync("INSERT ZeroKey VALUES (NULL)");
         }
 
     }
