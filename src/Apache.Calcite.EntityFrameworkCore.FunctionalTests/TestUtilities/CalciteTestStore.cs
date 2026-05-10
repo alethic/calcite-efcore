@@ -1,136 +1,49 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Reflection;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Apache.Calcite.Data;
 using Apache.Calcite.EntityFrameworkCore.Extensions;
-
-using ikvm.runtime;
-
-using IKVM.Jdbc.Data;
-
-using java.sql;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
-
-using org.apache.calcite.adapter.java;
-using org.apache.calcite.avatica;
-using org.apache.calcite.jdbc;
-using org.apache.calcite.sql.validate;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
 {
 
     /// <summary>
-    /// <see cref="RelationalTestStore"/> implementation for Calcite's RelationalSchema provider against Northwind.
+    /// <see cref="RelationalTestStore"/> implementation backed by an Apache Calcite ADO.NET connection.
     /// </summary>
     public class CalciteTestStore : RelationalTestStore
     {
 
         public const int CommandTimeout = 30;
 
-        readonly record struct CalciteStoreInstance(java.util.Properties Properties, CalciteSchema RootSchema, JavaTypeFactory TypeFactory);
-
-        static readonly org.apache.calcite.jdbc.Driver CalciteJdbcDriver;
-        static readonly CalciteJdbc41Factory CalciteJdbc41Factory;
-        static readonly MethodInfo newConnectionMethodInfo;
-
-        /// <summary>
-        /// Initializes the static instance.
-        /// </summary>
-        static CalciteTestStore()
-        {
-            Startup.addBootClassPathAssembly(typeof(org.apache.calcite.jdbc.Driver).Assembly);
-            Startup.addBootClassPathAssembly(typeof(org.apache.calcite.server.ServerDdlExecutor).Assembly);
-            Startup.addBootClassPathAssembly(typeof(org.joou.ULong).Assembly);
-
-            CalciteJdbcDriver = (org.apache.calcite.jdbc.Driver)DriverManager.getDriver("jdbc:calcite:");
-            CalciteJdbc41Factory = new CalciteJdbc41Factory();
-            newConnectionMethodInfo = typeof(CalciteJdbc41Factory).GetMethods(BindingFlags.Public | BindingFlags.Instance).First(i => i.Name == nameof(CalciteJdbc41Factory.newConnection) && i.GetParameters().Length == 6);
-        }
-
-        /// <summary>
-        /// Invokes the 'newConnection' method on <see cref="CalciteJdbc41Factory"/>. This method has two identical versions and cannot be resolved by C#.
-        /// </summary>
-        /// <param name="driver"></param>
-        /// <param name="factory"></param>
-        /// <param name="url"></param>
-        /// <param name="info"></param>
-        /// <param name="rootSchema"></param>
-        /// <param name="typeFactory"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        static Connection InvokeNewConnection(UnregisteredDriver driver, AvaticaFactory factory, string url, java.util.Properties info, CalciteSchema rootSchema, JavaTypeFactory typeFactory)
-        {
-            return (Connection?)newConnectionMethodInfo.Invoke(CalciteJdbc41Factory, [driver, factory, url, info, rootSchema, typeFactory]) ?? throw new InvalidOperationException();
-        }
-
-        static readonly ConcurrentDictionary<string, CalciteStoreInstance> _shared = new();
-
-        /// <summary>
-        /// Creates a new JDBC Calcite connection.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        static CalciteStoreInstance CreateStoreInstance(string name)
-        {
-            var properties = new java.util.Properties();
-            properties.setProperty("schema", name);
-            properties.setProperty("conformance", SqlConformanceEnum.LENIENT.name());
-            properties.setProperty("parserFactory", "org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY");
-
-            using var tmpConnection = DriverManager.getConnection("jdbc:calcite:");
-            var tmpCalciteConnection = (CalciteConnection)tmpConnection.unwrap(typeof(CalciteConnection));
-            var rootSchema = CalciteSchema.from(tmpCalciteConnection.getRootSchema());
-
-            return new CalciteStoreInstance(properties, rootSchema, tmpCalciteConnection.getTypeFactory());
-        }
-
-        /// <summary>
-        /// Creates a new JDBC Calcite connection to the specified store instance.
-        /// </summary>
-        /// <param name="instance"></param>
-        /// <returns></returns>
-        static JdbcConnection CreateConnection(CalciteStoreInstance instance)
-        {
-            return new JdbcConnection(() => InvokeNewConnection(CalciteJdbcDriver, CalciteJdbc41Factory, "jdbc:calcite:", instance.Properties, instance.RootSchema, instance.TypeFactory));
-        }
-
         /// <summary>
         /// Creates the specified store.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         public static CalciteTestStore Create(string name)
-        {
-            return new CalciteTestStore(name, false, CreateConnection(CreateStoreInstance(name)));
-        }
+            => new(name, shared: false);
 
         /// <summary>
-        /// Gets or creates the specified store 
+        /// Gets or creates the specified store.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         public static CalciteTestStore GetOrCreate(string name)
-        {
-            return new CalciteTestStore(name, true, CreateConnection(_shared.GetOrAdd(name, CreateStoreInstance)));
-        }
+            => new(name, shared: true);
+
+        static string BuildConnectionString(string name)
+            => $"schema={name};conformance=LENIENT;parserFactory=org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
 
         readonly string? _initScript;
 
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="shared"></param>
-        /// <param name="connection"></param>
-        /// <param name="initScript"></param>
-        protected CalciteTestStore(string name, bool shared, JdbcConnection connection, string? initScript = null) :
-            base(name, shared, connection)
+        protected CalciteTestStore(string name, bool shared, string? initScript = null)
+            : base(name, shared, new CalciteConnection(BuildConnectionString(name)))
         {
             _initScript = initScript;
         }
@@ -146,17 +59,15 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
                     b.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
                 });
             }
-            else
-            {
-                if (Connection is not JdbcConnection connection)
-                    throw new InvalidOperationException("Calcite Provider must be provided a JdbcConnection.");
 
-                return builder.UseCalcite(connection, b =>
-                {
-                    b.CommandTimeout(CommandTimeout);
-                    b.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
-                });
-            }
+            if (Connection is not CalciteConnection connection)
+                throw new InvalidOperationException("Calcite Provider must be provided a CalciteConnection.");
+
+            return builder.UseCalcite(connection, b =>
+            {
+                b.CommandTimeout(CommandTimeout);
+                b.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
+            });
         }
 
         /// <inheritdoc/>
@@ -165,16 +76,12 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             using var context = createContext();
 
             if (clean != null)
-            {
                 await clean(context);
-            }
 
             await CleanAsync(context);
 
             if (seed != null)
-            {
                 await seed(context);
-            }
         }
 
         /// <inheritdoc/>
@@ -183,9 +90,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
             context.Database.EnsureClean();
 
             if (_initScript is not null)
-            {
                 await context.Database.ExecuteScriptAsync(_initScript, CancellationToken.None);
-            }
         }
 
     }

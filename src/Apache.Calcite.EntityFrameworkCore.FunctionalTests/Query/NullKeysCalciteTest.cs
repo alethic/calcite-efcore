@@ -1,0 +1,16 @@
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query;
+#nullable disable
+
+public class NullKeysCalciteTest(NullKeysCalciteTest.NullKeysCalciteFixture fixture)
+    : NullKeysTestBase<NullKeysCalciteTest.NullKeysCalciteFixture>(fixture)
+{
+    public class NullKeysCalciteFixture : NullKeysFixtureBase
+    {
+        protected override ITestStoreFactory TestStoreFactory
+            => CalciteTestStoreFactory.Instance;
+    }
+}
+
