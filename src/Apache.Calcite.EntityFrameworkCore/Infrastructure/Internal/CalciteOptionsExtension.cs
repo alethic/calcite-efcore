@@ -5,7 +5,7 @@ using System.Text;
 
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 
-using IKVM.Jdbc.Data;
+using Apache.Calcite.Data;
 
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +20,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
     {
 
         DbContextOptionsExtensionInfo? _info;
-        JdbcProviderFactory? _jdbcProviderFactory;
+        CalciteProviderFactory? _providerFactory;
 
         /// <summary>
         /// Initializes a new instance.
@@ -47,19 +47,19 @@ namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
         protected override RelationalOptionsExtension Clone() => new CalciteOptionsExtension(this);
 
         /// <summary>
-        /// Gets the <see cref="JdbcProviderFactory"/> that will be used to initialize new connections.
+        /// Gets the <see cref="CalciteProviderFactory"/> that will be used to initialize new connections.
         /// </summary>
-        public virtual JdbcProviderFactory? JdbcProviderFactory => _jdbcProviderFactory;
+        public virtual CalciteProviderFactory? ProviderFactory => _providerFactory;
 
         /// <summary>
-        /// Sets the <see cref="JdbcProviderFactory"/> that will be used to initialize new connections.
+        /// Sets the <see cref="CalciteProviderFactory"/> that will be used to initialize new connections.
         /// </summary>
-        /// <param name="jdbcProviderFactory"></param>
+        /// <param name="providerFactory"></param>
         /// <returns></returns>
-        public virtual CalciteOptionsExtension WithJdbcProviderFactory(JdbcProviderFactory jdbcProviderFactory)
+        public virtual CalciteOptionsExtension WithProviderFactory(CalciteProviderFactory providerFactory)
         {
             var clone = (CalciteOptionsExtension)Clone();
-            clone._jdbcProviderFactory = jdbcProviderFactory;
+            clone._providerFactory = providerFactory;
             return clone;
         }
 
@@ -87,8 +87,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
                         var builder = new StringBuilder();
                         builder.Append(base.LogFragment);
 
-                        if (Extension._jdbcProviderFactory != null)
-                            builder.Append("JdbcProviderFactory ");
+                        if (Extension._providerFactory != null)
+                            builder.Append("CalciteProviderFactory ");
 
                         _logFragment = builder.ToString();
                     }
@@ -103,7 +103,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
                 _serviceProviderHash ??= HashCode.Combine(
                     base.GetServiceProviderHashCode(),
                     3313,
-                    Extension._jdbcProviderFactory);
+                    Extension._providerFactory);
 
                 return _serviceProviderHash.Value;
             }
@@ -111,7 +111,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Infrastructure.Internal
             /// <inheritdoc />
             public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
             {
-                debugInfo["CalciteJdbc:" + nameof(JdbcProviderFactory)] = (Extension._jdbcProviderFactory?.GetHashCode() ?? 0L).ToString(CultureInfo.InvariantCulture);
+                debugInfo["Calcite:" + nameof(ProviderFactory)] = (Extension._providerFactory?.GetHashCode() ?? 0L).ToString(CultureInfo.InvariantCulture);
             }
 
         }

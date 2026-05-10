@@ -16,13 +16,14 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="IKVM.Jdbc.Data" Version="1.0.14-pre.31" />
+        <PackageReference Include="Apache.Calcite.Data" Version="0.0.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.2" />
     </ItemGroup>
-    
+
     <ItemGroup>
-        <MavenReference Include="@(CalciteDependency)" />
-        <IkvmReference Include="@(CalciteIkvmReference)" />
+        <MavenReference Include="org.apache.calcite:calcite-linq4j" Version="$(CalciteVersion)" />
+        <MavenReference Include="org.apache.calcite:calcite-core" Version="$(CalciteVersion)" />
+        <MavenReference Include="org.apache.calcite:calcite-server" Version="$(CalciteVersion)" />
     </ItemGroup>
 
     <ItemGroup>

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 
-using IKVM.Jdbc.Data;
-
-using java.sql;
+using Apache.Calcite.Data;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -13,7 +11,8 @@ using Microsoft.EntityFrameworkCore.Scaffolding;
 using Microsoft.EntityFrameworkCore.Scaffolding.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 
-using org.apache.calcite.jdbc;
+using org.apache.calcite.rel.type;
+using org.apache.calcite.schema;
 
 namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
 {
@@ -36,15 +35,15 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
         /// <inheritdoc/>
         public override DatabaseModel Create(string connectionString, DatabaseModelFactoryOptions options)
         {
-            using var connection = new JdbcConnection(connectionString);
+            using var connection = new CalciteConnection(connectionString);
             return Create(connection, options);
         }
 
         /// <inheritdoc/>
         public override DatabaseModel Create(DbConnection connection, DatabaseModelFactoryOptions options)
         {
-            if (connection is not JdbcConnection jdbcConnection)
-                throw new InvalidOperationException("Database connection must be a JdbcConnection.");
+            if (connection is not CalciteConnection calciteConnection)
+                throw new InvalidOperationException("Database connection must be a CalciteConnection.");
 
             var connectionStartedOpen = connection.State == ConnectionState.Open;
 
@@ -53,11 +52,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
                 if (connectionStartedOpen == false)
                     connection.Open();
 
-                var calcite = (CalciteConnection?)jdbcConnection.JdbcConnection.unwrap(typeof(CalciteConnection));
-                if (calcite is null)
-                    throw new InvalidOperationException("Could not unwrap CalciteConnection.");
-
-                return GetDatabase(jdbcConnection, calcite);
+                return GetDatabase(calciteConnection);
             }
             finally
             {
@@ -67,90 +62,108 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
         }
 
         /// <summary>
-        /// Gets the database model.
+        /// Gets the database model from the open Calcite connection.
         /// </summary>
         /// <param name="connection"></param>
-        /// <param name="calcite"></param>
         /// <returns></returns>
-        DatabaseModel GetDatabase(JdbcConnection connection, CalciteConnection calcite)
+        DatabaseModel GetDatabase(CalciteConnection connection)
         {
             var model = new DatabaseModel();
+            model.DatabaseName = connection.Database;
+            model.DefaultSchema = connection.RootSchema.getName();
 
-            model.DatabaseName = connection.JdbcConnection.getCatalog();
-            model.DefaultSchema = connection.JdbcConnection.getSchema();
+            var typeFactory = connection.TypeFactory;
 
-            foreach (var table in GetTables(model, connection, calcite))
-                model.Tables.Add(table);
+            foreach (var schema in EnumerateSchemas(connection.RootSchema))
+                foreach (var table in GetTables(model, schema, typeFactory))
+                    model.Tables.Add(table);
 
             return model;
         }
 
         /// <summary>
-        /// Gets the tables within the database.
+        /// Enumerates the root schema and all of its sub-schemas.
+        /// </summary>
+        /// <param name="root"></param>
+        /// <returns></returns>
+        static IEnumerable<SchemaPlus> EnumerateSchemas(SchemaPlus root)
+        {
+            yield return root;
+
+            foreach (var name in root.getSubSchemaNames().toArray())
+            {
+                var sub = root.getSubSchema((string)name);
+                if (sub is null)
+                    continue;
+
+                foreach (var nested in EnumerateSchemas(sub))
+                    yield return nested;
+            }
+        }
+
+        /// <summary>
+        /// Gets the tables defined within the given schema.
         /// </summary>
         /// <param name="database"></param>
-        /// <param name="connection"></param>
-        /// <param name="calcite"></param>
+        /// <param name="schema"></param>
+        /// <param name="typeFactory"></param>
         /// <returns></returns>
-        IEnumerable<DatabaseTable> GetTables(DatabaseModel database, JdbcConnection connection, CalciteConnection calcite)
+        IEnumerable<DatabaseTable> GetTables(DatabaseModel database, SchemaPlus schema, org.apache.calcite.adapter.java.JavaTypeFactory typeFactory)
         {
-            using var resultSet = calcite.getMetaData().getTables(null, null, null, ["TABLE"]);
-            while (resultSet.next())
-                yield return GetTable(database, connection, calcite, resultSet);
+            foreach (var name in schema.getTableNames().toArray())
+            {
+                var tableName = (string)name;
+                var table = schema.getTable(tableName);
+                if (table is null)
+                    continue;
+
+                yield return GetTable(database, schema, tableName, table, typeFactory);
+            }
         }
 
         /// <summary>
-        /// Gets a table from the current row of the result set.
+        /// Builds a <see cref="DatabaseTable"/> from a Calcite <see cref="Table"/>.
         /// </summary>
         /// <param name="model"></param>
-        /// <param name="connection"></param>
-        /// <param name="calcite"></param>
-        /// <param name="resultSet"></param>
+        /// <param name="schema"></param>
+        /// <param name="tableName"></param>
+        /// <param name="table"></param>
+        /// <param name="typeFactory"></param>
         /// <returns></returns>
-        DatabaseTable GetTable(DatabaseModel model, JdbcConnection connection, CalciteConnection calcite, ResultSet resultSet)
+        DatabaseTable GetTable(DatabaseModel model, SchemaPlus schema, string tableName, Table table, org.apache.calcite.adapter.java.JavaTypeFactory typeFactory)
         {
-            var table = new DatabaseTable();
-            table.Database = model;
-            table.Schema = resultSet.getString("TABLE_SCHEM");
-            table.Name = resultSet.getString("TABLE_NAME");
+            var databaseTable = new DatabaseTable();
+            databaseTable.Database = model;
+            databaseTable.Schema = schema.getName();
+            databaseTable.Name = tableName;
 
-            foreach (var column in GetColumns(table, connection, calcite))
-                table.Columns.Add(column);
+            var rowType = table.getRowType(typeFactory);
+            foreach (var column in GetColumns(databaseTable, rowType))
+                databaseTable.Columns.Add(column);
 
-            return table;
+            return databaseTable;
         }
 
         /// <summary>
-        /// Gets the tables within the database.
+        /// Gets the columns described by the given Calcite row type.
         /// </summary>
         /// <param name="table"></param>
-        /// <param name="connection"></param>
-        /// <param name="calcite"></param>
+        /// <param name="rowType"></param>
         /// <returns></returns>
-        IEnumerable<DatabaseColumn> GetColumns(DatabaseTable table, JdbcConnection connection, CalciteConnection calcite)
+        IEnumerable<DatabaseColumn> GetColumns(DatabaseTable table, RelDataType rowType)
         {
-            using var resultSet = calcite.getMetaData().getColumns(null, table.Schema, table.Name, null);
-            while (resultSet.next())
-                yield return GetColumn(table, connection, calcite, resultSet);
-        }
+            foreach (var field in rowType.getFieldList().toArray())
+            {
+                var f = (RelDataTypeField)field;
+                var fieldType = f.getType();
 
-        /// <summary>
-        /// Gets a column from the current row of the result set.
-        /// </summary>
-        /// <param name="table"></param>
-        /// <param name="connection"></param>
-        /// <param name="calcite"></param>
-        /// <param name="resultSet"></param>
-        /// <returns></returns>
-        DatabaseColumn GetColumn(DatabaseTable table, JdbcConnection connection, CalciteConnection calcite, ResultSet resultSet)
-        {
-            var databaseColumn = new DatabaseColumn();
-            databaseColumn.Table = table;
-            databaseColumn.Name = resultSet.getString("COLUMN_NAME");
-            databaseColumn.IsNullable = resultSet.getInt("NULLABLE") == 1;
-            databaseColumn.StoreType = resultSet.getString("TYPE_NAME");
-            databaseColumn.IsStored = resultSet.getString("IS_GENERATEDCOLUMN") == "YES";
-            return databaseColumn;
+                var column = new DatabaseColumn();
+                column.Table = table;
+                column.Name = f.getName();
+                column.IsNullable = fieldType.isNullable();
+                column.StoreType = fieldType.getSqlTypeName().getName();
+                yield return column;
+            }
         }
 
     }

@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 using Apache.Calcite.EntityFrameworkCore.Metadata;
 
-using IKVM.Jdbc.Data;
+using Apache.Calcite.Data;
 
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -60,8 +60,8 @@ namespace Apache.Calcite.EntityFrameworkCore.ValueGeneration
         /// <returns></returns>
         static string GetEntitySequenceKey(ICalciteReadOnlyEntitySequence sequence, IRelationalConnection connection)
         {
-            var jdbcConnection = (JdbcConnection)connection.DbConnection;
-            return $"{jdbcConnection.ConnectionString}::{sequence.Name}";
+            var calciteConnection = (CalciteConnection)connection.DbConnection;
+            return $"{calciteConnection.ConnectionString}::{sequence.Name}";
         }
 
     }

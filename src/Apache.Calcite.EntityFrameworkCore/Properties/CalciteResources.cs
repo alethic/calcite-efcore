@@ -2,7 +2,7 @@
 using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
 using Apache.Calcite.EntityFrameworkCore.Internal;
 
-using IKVM.Jdbc.Data;
+using Apache.Calcite.Data;
 
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
@@ -14,7 +14,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Properties
     {
 
         /// <summary>
-        /// An ADO.NET Connection object other than <see cref="JdbcConnection"/> was passed.
+        /// An ADO.NET Connection object other than <see cref="CalciteConnection"/> was passed.
         /// </summary>
         /// <param name="logger"></param>
         /// <returns></returns>

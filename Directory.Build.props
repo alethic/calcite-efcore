@@ -46,71 +46,10 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <CalciteVersion>1.42.0</CalciteVersion>
+        <CalciteVersion>1.42.0-SNAPSHOT</CalciteVersion>
         <AvaticaVersion>1.27.0</AvaticaVersion>
+        <CalciteLocalMavenRepo>$(MSBuildThisFileDirectory)ext\maven-repo</CalciteLocalMavenRepo>
+        <MavenAdditionalRepositories>$(MavenAdditionalRepositories);calcite-local=file:///$([MSBuild]::NormalizePath('$(CalciteLocalMavenRepo)').Replace('\','/'))</MavenAdditionalRepositories>
     </PropertyGroup>
 
-    <ItemGroup>
-        <CalciteDependency Include="org.locationtech.jts:jts-core" Version="1.19.0" />
-        <CalciteDependency Include="org.locationtech.jts.io:jts-io-common" Version="1.19.0" />
-        <CalciteDependency Include="org.locationtech.proj4j:proj4j" Version="1.2.2" />
-        <CalciteDependency Include="com.fasterxml.jackson.core:jackson-annotations" Version="2.18.6" />
-        <CalciteDependency Include="com.google.errorprone:error_prone_annotations" Version="2.36.0" />
-        <CalciteDependency Include="com.google.guava:guava" Version="33.4.8-jre" />
-        <CalciteDependency Include="com.google.guava:failureaccess" Version="1.0.3" />
-        <CalciteDependency Include="com.google.guava:listenablefuture" Version="9999.0-empty-to-avoid-conflict-with-guava" />
-        <CalciteDependency Include="com.google.j2objc:j2objc-annotations" Version="3.0.0" />
-        <CalciteDependency Include="org.jspecify:jspecify" Version="1.0.0" />
-        <CalciteDependency Include="com.google.protobuf:protobuf-java" Version="3.25.8" />
-        <CalciteDependency Include="org.apache.calcite.avatica:avatica-core" Version="$(AvaticaVersion)" />
-        <CalciteDependency Include="org.apache.calcite.avatica:avatica-metrics" Version="$(AvaticaVersion)" />
-        <CalciteDependency Include="org.apache.httpcomponents.client5:httpclient5" Version="5.5" />
-        <CalciteDependency Include="org.apache.httpcomponents.core5:httpcore5" Version="5.3.5" />
-        <CalciteDependency Include="org.apache.httpcomponents.core5:httpcore5-h2" Version="5.3.4" />
-        <CalciteDependency Include="org.apiguardian:apiguardian-api" Version="1.1.2" />
-        <CalciteDependency Include="org.checkerframework:checker-qual" Version="3.10.0" />
-        <CalciteDependency Include="org.checkerframework:checker" Version="3.10.0" />
-        <CalciteDependency Include="org.slf4j:slf4j-api" Version="1.7.25" />
-        <CalciteDependency Include="commons-logging:commons-logging" Version="1.3.5" />
-        <CalciteDependency Include="com.fasterxml.jackson.core:jackson-core" Version="2.18.6" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="com.fasterxml.jackson.core:jackson-databind" Version="2.18.6" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" Version="2.18.6" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.yaml:snakeyaml" Version="2.3" />
-        <CalciteDependency Include="com.google.uzaygezen:uzaygezen-core" Version="0.2" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on;log4j:log4j" />
-        <CalciteDependency Include="com.jayway.jsonpath:json-path" Version="2.10.0" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="net.minidev:json-smart" Version="2.6.0" />
-        <CalciteDependency Include="net.minidev:accessors-smart" Version="2.6.0" />
-        <CalciteDependency Include="org.ow2.asm:asm" Version="9.9.1" />
-        <CalciteDependency Include="com.yahoo.datasketches:sketches-core" Version="0.9.0" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="com.yahoo.datasketches:memory" Version="0.9.0" />
-        <CalciteDependency Include="com.googlecode.json-simple:json-simple" Version="1.1.1" />
-        <CalciteDependency Include="commons-codec:commons-codec" Version="1.16.0" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="net.hydromatic:aggdesigner-algorithm" Version="6.1" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.apache.commons:commons-dbcp2" Version="2.11.0" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.apache.commons:commons-pool2" Version="2.12.0" />
-        <CalciteDependency Include="jakarta.transaction:jakarta.transaction-api" Version="1.3.3" />
-        <CalciteDependency Include="org.apache.commons:commons-lang3" Version="3.18.0" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.apache.commons:commons-math3" Version="3.6.1" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.apache.commons:commons-text" Version="1.11.0" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.jooq:joou-java-6" Version="0.9.5" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="commons-io:commons-io" Version="2.15.0" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.codehaus.janino:commons-compiler" Version="3.1.12" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.codehaus.janino:janino" Version="3.1.12" Exclusions="org.jetbrains:annotations;org.bouncycastle:bcprov-jdk15on" />
-        <CalciteDependency Include="org.immutables:value" Version="2.9.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <CalciteMavenReference Include="@(CalciteDependency)" />
-    </ItemGroup>
-
-    <PropertyGroup>
-        <CalciteReferences>@(CalciteDependency->'maven$%(Identity):%(Version)', ';')</CalciteReferences>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <CalciteIkvmReference Include="$(MSBuildThisFileDirectory)ext\calcite-linq4j-$(CalciteVersion)-SNAPSHOT.jar" References="$(CalciteReferences)" />
-        <CalciteIkvmReference Include="$(MSBuildThisFileDirectory)ext\calcite-core-$(CalciteVersion)-SNAPSHOT.jar" References="$(CalciteReferences);$(MSBuildThisFileDirectory)ext\calcite-linq4j-$(CalciteVersion)-SNAPSHOT.jar" />
-        <CalciteIkvmReference Include="$(MSBuildThisFileDirectory)ext\calcite-server-$(CalciteVersion)-SNAPSHOT.jar" References="$(CalciteReferences);$(MSBuildThisFileDirectory)ext\calcite-linq4j-$(CalciteVersion)-SNAPSHOT.jar;$(MSBuildThisFileDirectory)ext\calcite-core-$(CalciteVersion)-SNAPSHOT.jar" />
-    </ItemGroup>
-
-</Project>
+    </Project>
