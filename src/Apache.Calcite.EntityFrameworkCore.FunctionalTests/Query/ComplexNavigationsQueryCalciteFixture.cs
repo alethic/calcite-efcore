@@ -9,8 +9,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
     public class ComplexNavigationsQueryCalciteFixture : ComplexNavigationsQueryRelationalFixtureBase
     {
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
     }
 

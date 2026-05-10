@@ -9,11 +9,6 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
     public class NorthwindFunctionsQueryCalciteTest : NorthwindFunctionsQueryTestBase<NorthwindQueryCalciteFixture<NoopModelCustomizer>>
     {
 
-        /// <summary>
-        /// Initializes a new instance.
-        /// </summary>
-        /// <param name="fixture"></param>
-        /// <param name="testOutputHelper"></param>
         public NorthwindFunctionsQueryCalciteTest(NorthwindQueryCalciteFixture<NoopModelCustomizer> fixture, ITestOutputHelper testOutputHelper) :
             base(fixture)
         {

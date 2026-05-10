@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Inheritance;
 
-internal class TPCRelationshipsQueryCalciteTest : TPCRelationshipsQueryTestBase<TPCRelationshipsQueryCalciteTest.TPCRelationshipsQueryCalciteFixture>
+public class TPCRelationshipsQueryCalciteTest : TPCRelationshipsQueryTestBase<TPCRelationshipsQueryCalciteTest.TPCRelationshipsQueryCalciteFixture>
 {
 
     public TPCRelationshipsQueryCalciteTest(TPCRelationshipsQueryCalciteFixture fixture) :

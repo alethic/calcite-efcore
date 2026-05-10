@@ -19,6 +19,7 @@ public class ComplexTypeQueryCalciteTest : ComplexTypeQueryRelationalTestBase<Co
 
     public class ComplexTypeQueryCalciteFixture : ComplexTypeQueryRelationalFixtureBase
     {
+
         protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
     }

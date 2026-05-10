@@ -15,40 +15,42 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 public abstract class SaveChangesInterceptionCalciteTestBase(SaveChangesInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture) :
     SaveChangesInterceptionTestBase(fixture)
 {
+
     public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
-        protected override string StoreName
-            => "SaveChangesInterception";
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        protected override string StoreName => "SaveChangesInterception";
 
-        protected override IServiceCollection InjectInterceptors(
-            IServiceCollection serviceCollection,
-            IEnumerable<IInterceptor> injectedInterceptors)
-            => base.InjectInterceptors(serviceCollection.AddEntityFrameworkCalcite(), injectedInterceptors);
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
+
+        protected override IServiceCollection InjectInterceptors(IServiceCollection serviceCollection, IEnumerable<IInterceptor> injectedInterceptors) => base.InjectInterceptors(serviceCollection.AddEntityFrameworkCalcite(), injectedInterceptors);
+
     }
 
-    public class SaveChangesInterceptionCalciteTest(SaveChangesInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : SaveChangesInterceptionCalciteTestBase(fixture), IClassFixture<SaveChangesInterceptionCalciteTest.InterceptionCalciteFixture>
+    public class SaveChangesInterceptionCalciteTest(SaveChangesInterceptionCalciteTest.InterceptionCalciteFixture fixture) :
+        SaveChangesInterceptionCalciteTestBase(fixture),
+        IClassFixture<SaveChangesInterceptionCalciteTest.InterceptionCalciteFixture>
     {
+
         public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
-            protected override bool ShouldSubscribeToDiagnosticListener
-                => false;
+
+            protected override bool ShouldSubscribeToDiagnosticListener => false;
+
         }
+
     }
 
-    public class SaveChangesInterceptionWithDiagnosticsCalciteTest(
-        SaveChangesInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : SaveChangesInterceptionCalciteTestBase(fixture),
-            IClassFixture<SaveChangesInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
+    public class SaveChangesInterceptionWithDiagnosticsCalciteTest(SaveChangesInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture) :
+        SaveChangesInterceptionCalciteTestBase(fixture),
+        IClassFixture<SaveChangesInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
+
         public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
-            protected override bool ShouldSubscribeToDiagnosticListener
-                => true;
+            protected override bool ShouldSubscribeToDiagnosticListener => true;
         }
+
     }
+
 }
-

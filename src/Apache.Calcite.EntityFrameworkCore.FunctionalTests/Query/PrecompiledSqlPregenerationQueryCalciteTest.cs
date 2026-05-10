@@ -5,24 +5,24 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 
 using Xunit;
 using Xunit.Abstractions;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query;
 
-public class PrecompiledSqlPregenerationQuerySqlServerTest(
-    PrecompiledSqlPregenerationQuerySqlServerTest.PrecompiledSqlPregenerationQueryCalciteFixture fixture,
-    ITestOutputHelper testOutputHelper)
-    : PrecompiledSqlPregenerationQueryRelationalTestBase(fixture, testOutputHelper),
-        IClassFixture<PrecompiledSqlPregenerationQuerySqlServerTest.PrecompiledSqlPregenerationQueryCalciteFixture>
+public class PrecompiledSqlPregenerationQuerySqlServerTest(PrecompiledSqlPregenerationQuerySqlServerTest.PrecompiledSqlPregenerationQueryCalciteFixture fixture, ITestOutputHelper testOutputHelper) :
+    PrecompiledSqlPregenerationQueryRelationalTestBase(fixture, testOutputHelper),
+    IClassFixture<PrecompiledSqlPregenerationQuerySqlServerTest.PrecompiledSqlPregenerationQueryCalciteFixture>
 {
-    protected override bool AlwaysPrintGeneratedSources
-        => false;
+
+    protected override bool AlwaysPrintGeneratedSources => false;
 
     public class PrecompiledSqlPregenerationQueryCalciteFixture : PrecompiledSqlPregenerationQueryRelationalFixture
     {
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
 
-        public override PrecompiledQueryTestHelpers PrecompiledQueryTestHelpers
-            => CalcitePrecompiledQueryTestHelpers.Instance;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
+
+        public override PrecompiledQueryTestHelpers PrecompiledQueryTestHelpers => CalcitePrecompiledQueryTestHelpers.Instance;
+
     }
+
 }
 

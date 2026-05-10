@@ -6,11 +6,9 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Associations.OwnedNavigations
 {
 
-    /// <inheritdoc/>
     public class OwnedNavigationsCalciteFixture : OwnedNavigationsRelationalFixtureBase
     {
 
-        /// <inheritdoc/>
         protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
     }

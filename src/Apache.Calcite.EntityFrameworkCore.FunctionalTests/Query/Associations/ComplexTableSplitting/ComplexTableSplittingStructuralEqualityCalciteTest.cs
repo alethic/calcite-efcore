@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore.Query.Associations.ComplexTableSplitting;
 
 using Xunit.Abstractions;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Associations.ComplexTableSplitting;
 
-public class ComplexTableSplittingStructuralEqualityCalciteTest(
-    ComplexTableSplittingCalciteFixture fixture,
-    ITestOutputHelper testOutputHelper)
-    : ComplexTableSplittingStructuralEqualityRelationalTestBase<ComplexTableSplittingCalciteFixture>(fixture, testOutputHelper);
+public class ComplexTableSplittingStructuralEqualityCalciteTest(ComplexTableSplittingCalciteFixture fixture, ITestOutputHelper testOutputHelper) :
+    ComplexTableSplittingStructuralEqualityRelationalTestBase<ComplexTableSplittingCalciteFixture>(fixture, testOutputHelper);
 

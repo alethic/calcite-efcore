@@ -11,6 +11,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 public class DesignTimeCalciteTest(DesignTimeCalciteTest.DesignTimeCalciteFixture fixture) :
     DesignTimeTestBase<DesignTimeCalciteTest.DesignTimeCalciteFixture>(fixture)
 {
+
     protected override Assembly ProviderAssembly => typeof(CalciteDesignTimeServices).Assembly;
 
     public class DesignTimeCalciteFixture : DesignTimeFixtureBase

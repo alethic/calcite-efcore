@@ -6,13 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 using Xunit.Abstractions;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 
-public class ConvertToProviderTypesCalciteTest : ConvertToProviderTypesTestBase<
-    ConvertToProviderTypesCalciteTest.ConvertToProviderTypesCalciteFixture>
+public class ConvertToProviderTypesCalciteTest : ConvertToProviderTypesTestBase<ConvertToProviderTypesCalciteTest.ConvertToProviderTypesCalciteFixture>
 {
-    public ConvertToProviderTypesCalciteTest(ConvertToProviderTypesCalciteFixture fixture, ITestOutputHelper testOutputHelper)
-        : base(fixture)
+
+    public ConvertToProviderTypesCalciteTest(ConvertToProviderTypesCalciteFixture fixture, ITestOutputHelper testOutputHelper) :
+        base(fixture)
     {
         fixture.TestSqlLoggerFactory.Clear();
         fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
@@ -20,35 +21,28 @@ public class ConvertToProviderTypesCalciteTest : ConvertToProviderTypesTestBase<
 
     public class ConvertToProviderTypesCalciteFixture : ConvertToProviderTypesFixtureBase, ITestSqlLoggerFactory
     {
-        public override bool StrictEquality
-            => false;
 
-        public override bool SupportsAnsi
-            => false;
+        public override bool StrictEquality => false;
 
-        public override bool SupportsUnicodeToAnsiConversion
-            => true;
+        public override bool SupportsAnsi => false;
 
-        public override bool SupportsLargeStringComparisons
-            => true;
+        public override bool SupportsUnicodeToAnsiConversion => true;
 
-        public override bool SupportsDecimalComparisons
-            => false;
+        public override bool SupportsLargeStringComparisons => true;
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        public override bool SupportsDecimalComparisons => false;
 
-        public TestSqlLoggerFactory TestSqlLoggerFactory
-            => (TestSqlLoggerFactory)ListLoggerFactory;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
-        public override bool SupportsBinaryKeys
-            => true;
+        public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
 
-        public override DateTime DefaultDateTime
-            => new();
+        public override bool SupportsBinaryKeys => true;
 
-        public override bool PreservesDateTimeKind
-            => true;
+        public override DateTime DefaultDateTime => new();
+
+        public override bool PreservesDateTimeKind => true;
+
     }
+
 }
 

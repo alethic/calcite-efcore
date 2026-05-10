@@ -8,8 +8,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Update;
 
 public class JsonUpdateCalciteFixture : JsonUpdateFixtureBase
 {
-    protected override ITestStoreFactory TestStoreFactory
-        => CalciteTestStoreFactory.Instance;
+    protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
     {

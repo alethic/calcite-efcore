@@ -1,38 +1,37 @@
-using Apache.Calcite.EntityFrameworkCore.Extensions;
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 using Xunit;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 
-public class TwoDatabasesCalciteTest(TwoDatabasesCalciteTest.TwoDatabasesFixture fixture)
-    : TwoDatabasesTestBase(fixture), IClassFixture<TwoDatabasesCalciteTest.TwoDatabasesFixture>
+public class TwoDatabasesCalciteTest(TwoDatabasesCalciteTest.TwoDatabasesFixture fixture) :
+    TwoDatabasesTestBase(fixture),
+    IClassFixture<TwoDatabasesCalciteTest.TwoDatabasesFixture>
 {
-    protected new TwoDatabasesFixture Fixture
-        => (TwoDatabasesFixture)base.Fixture;
 
-    protected override DbContextOptionsBuilder CreateTestOptions(
-        DbContextOptionsBuilder optionsBuilder,
-        bool withConnectionString = false,
-        bool withNullConnectionString = false)
-        => withConnectionString
-            ? withNullConnectionString
-                ? optionsBuilder.UseCalcite((string)null)
-                : optionsBuilder.UseCalcite(DummyConnectionString)
-            : optionsBuilder.UseCalcite();
+    protected new TwoDatabasesFixture Fixture => (TwoDatabasesFixture)base.Fixture;
+
+    protected override string DummyConnectionString => throw new System.NotImplementedException();
 
     protected override TwoDatabasesWithDataContext CreateBackingContext(string databaseName)
-        => new(Fixture.CreateOptions(CalciteTestStore.Create(databaseName)));
+    {
+        throw new System.NotImplementedException();
+    }
 
-    protected override string DummyConnectionString
-        => "DataSource=DummyDatabase";
+    protected override DbContextOptionsBuilder CreateTestOptions(DbContextOptionsBuilder optionsBuilder, bool withConnectionString = false, bool withNullConnectionString = false)
+    {
+        throw new System.NotImplementedException();
+    }
 
     public class TwoDatabasesFixture : ServiceProviderFixtureBase
     {
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
+
     }
+
 }
 

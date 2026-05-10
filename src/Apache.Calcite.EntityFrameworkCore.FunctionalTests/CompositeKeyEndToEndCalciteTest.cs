@@ -1,6 +1,3 @@
-using System.Threading.Tasks;
-
-using Apache.Calcite.EntityFrameworkCore.Diagnostics;
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
 
 using Microsoft.EntityFrameworkCore;

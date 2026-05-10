@@ -9,45 +9,54 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 
-public abstract class TransactionInterceptionCalciteTestBase(TransactionInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture)
-    : TransactionInterceptionTestBase(fixture)
+public abstract class TransactionInterceptionCalciteTestBase(TransactionInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture) :
+    TransactionInterceptionTestBase(fixture)
 {
+
     public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
-        protected override string StoreName
-            => "TransactionInterception";
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        protected override string StoreName => "TransactionInterception";
+
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
         protected override IServiceCollection InjectInterceptors(
             IServiceCollection serviceCollection,
             IEnumerable<IInterceptor> injectedInterceptors)
             => base.InjectInterceptors(serviceCollection.AddEntityFrameworkCalcite(), injectedInterceptors);
+
     }
 
-    public class TransactionInterceptionCalciteTest(TransactionInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : TransactionInterceptionCalciteTestBase(fixture), IClassFixture<TransactionInterceptionCalciteTest.InterceptionCalciteFixture>
+    public class TransactionInterceptionCalciteTest(TransactionInterceptionCalciteTest.InterceptionCalciteFixture fixture) :
+        TransactionInterceptionCalciteTestBase(fixture),
+        IClassFixture<TransactionInterceptionCalciteTest.InterceptionCalciteFixture>
     {
+
         public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
-            protected override bool ShouldSubscribeToDiagnosticListener
-                => false;
+
+            protected override bool ShouldSubscribeToDiagnosticListener => false;
+
         }
+
     }
 
-    public class TransactionInterceptionWithDiagnosticsCalciteTest(
-        TransactionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : TransactionInterceptionCalciteTestBase(fixture),
-            IClassFixture<TransactionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
+    public class TransactionInterceptionWithDiagnosticsCalciteTest(TransactionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture) :
+        TransactionInterceptionCalciteTestBase(fixture),
+        IClassFixture<TransactionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
+
         public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
-            protected override bool ShouldSubscribeToDiagnosticListener
-                => true;
+
+            protected override bool ShouldSubscribeToDiagnosticListener => true;
+
         }
+
     }
+
 }
 

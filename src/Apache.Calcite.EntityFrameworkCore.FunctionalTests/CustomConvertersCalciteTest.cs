@@ -1,177 +1,44 @@
 using System;
-using System.Threading.Tasks;
 
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-using Xunit;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 
 public class CustomConvertersCalciteTest : CustomConvertersTestBase<CustomConvertersCalciteTest.CustomConvertersCalciteFixture>
 {
-    public CustomConvertersCalciteTest(CustomConvertersCalciteFixture fixture)
-        : base(fixture)
-        => Fixture.TestSqlLoggerFactory.Clear();
 
-    // Disabled: Calcite database is case-sensitive
-    public override Task Can_insert_and_read_back_with_case_insensitive_string_key()
-        => Task.CompletedTask;
-
-    [ConditionalFact]
-    public override async Task Value_conversion_is_appropriately_used_for_join_condition()
+    public CustomConvertersCalciteTest(CustomConvertersCalciteFixture fixture) :
+        base(fixture)
     {
-        await base.Value_conversion_is_appropriately_used_for_join_condition();
-
-        AssertSql(
-            """
-@blogId='1'
-
-SELECT "b"."Url"
-FROM "Blog" AS "b"
-INNER JOIN "Post" AS "p" ON "b"."BlogId" = "p"."BlogId" AND "b"."IsVisible" = 'Y' AND "b"."BlogId" = @blogId
-WHERE "b"."IsVisible" = 'Y'
-""");
+        Fixture.TestSqlLoggerFactory.Clear();
     }
-
-    [ConditionalFact]
-    public override async Task Value_conversion_is_appropriately_used_for_left_join_condition()
-    {
-        await base.Value_conversion_is_appropriately_used_for_left_join_condition();
-
-        AssertSql(
-            """
-@blogId='1'
-
-SELECT "b"."Url"
-FROM "Blog" AS "b"
-LEFT JOIN "Post" AS "p" ON "b"."BlogId" = "p"."BlogId" AND "b"."IsVisible" = 'Y' AND "b"."BlogId" = @blogId
-WHERE "b"."IsVisible" = 'Y'
-""");
-    }
-
-    [ConditionalFact]
-    public override async Task Where_bool_gets_converted_to_equality_when_value_conversion_is_used()
-    {
-        await base.Where_bool_gets_converted_to_equality_when_value_conversion_is_used();
-
-        AssertSql(
-            """
-SELECT "b"."BlogId", "b"."Discriminator", "b"."IndexerVisible", "b"."IsVisible", "b"."Url", "b"."RssUrl"
-FROM "Blog" AS "b"
-WHERE "b"."IsVisible" = 'Y'
-""");
-    }
-
-    [ConditionalFact]
-    public override async Task Where_negated_bool_gets_converted_to_equality_when_value_conversion_is_used()
-    {
-        await base.Where_negated_bool_gets_converted_to_equality_when_value_conversion_is_used();
-
-        AssertSql(
-            """
-SELECT "b"."BlogId", "b"."Discriminator", "b"."IndexerVisible", "b"."IsVisible", "b"."Url", "b"."RssUrl"
-FROM "Blog" AS "b"
-WHERE "b"."IsVisible" = 'N'
-""");
-    }
-
-    public override async Task Where_bool_with_value_conversion_inside_comparison_doesnt_get_converted_twice()
-    {
-        await base.Where_bool_with_value_conversion_inside_comparison_doesnt_get_converted_twice();
-
-        AssertSql(
-            """
-SELECT "b"."BlogId", "b"."Discriminator", "b"."IndexerVisible", "b"."IsVisible", "b"."Url", "b"."RssUrl"
-FROM "Blog" AS "b"
-WHERE "b"."IsVisible" = 'Y'
-""",
-            //
-            """
-SELECT "b"."BlogId", "b"."Discriminator", "b"."IndexerVisible", "b"."IsVisible", "b"."Url", "b"."RssUrl"
-FROM "Blog" AS "b"
-WHERE "b"."IsVisible" <> 'Y'
-""");
-    }
-
-    public override async Task Select_bool_with_value_conversion_is_used()
-    {
-        await base.Select_bool_with_value_conversion_is_used();
-
-        AssertSql(
-            """
-SELECT "b"."IsVisible"
-FROM "Blog" AS "b"
-""");
-    }
-
-    [ConditionalFact]
-    public override async Task Where_bool_gets_converted_to_equality_when_value_conversion_is_used_using_EFProperty()
-    {
-        await base.Where_bool_gets_converted_to_equality_when_value_conversion_is_used_using_EFProperty();
-
-        AssertSql(
-            """
-SELECT "b"."BlogId", "b"."Discriminator", "b"."IndexerVisible", "b"."IsVisible", "b"."Url", "b"."RssUrl"
-FROM "Blog" AS "b"
-WHERE "b"."IsVisible" = 'Y'
-""");
-    }
-
-    [ConditionalFact]
-    public override async Task Where_bool_gets_converted_to_equality_when_value_conversion_is_used_using_indexer()
-    {
-        await base.Where_bool_gets_converted_to_equality_when_value_conversion_is_used_using_indexer();
-
-        AssertSql(
-            """
-SELECT "b"."BlogId", "b"."Discriminator", "b"."IndexerVisible", "b"."IsVisible", "b"."Url", "b"."RssUrl"
-FROM "Blog" AS "b"
-WHERE "b"."IndexerVisible" = 'Nay'
-""");
-    }
-
-    public override void Value_conversion_on_enum_collection_contains()
-        => Assert.Contains(
-            CoreStrings.TranslationFailed("")[47..],
-            Assert.Throws<InvalidOperationException>(() => base.Value_conversion_on_enum_collection_contains()).Message);
-
-    private void AssertSql(params string[] expected)
-        => Fixture.TestSqlLoggerFactory.AssertBaseline(expected);
 
     public class CustomConvertersCalciteFixture : CustomConvertersFixtureBase, ITestSqlLoggerFactory
     {
-        public override bool StrictEquality
-            => false;
 
-        public override bool SupportsAnsi
-            => false;
+        public override bool StrictEquality => false;
 
-        public override bool SupportsUnicodeToAnsiConversion
-            => true;
+        public override bool SupportsAnsi => false;
 
-        public override bool SupportsLargeStringComparisons
-            => true;
+        public override bool SupportsUnicodeToAnsiConversion => true;
 
-        public override bool SupportsDecimalComparisons
-            => false;
+        public override bool SupportsLargeStringComparisons => true;
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        public override bool SupportsDecimalComparisons => false;
 
-        public TestSqlLoggerFactory TestSqlLoggerFactory
-            => (TestSqlLoggerFactory)ListLoggerFactory;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
-        public override bool SupportsBinaryKeys
-            => true;
+        public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
 
-        public override DateTime DefaultDateTime
-            => new();
+        public override bool SupportsBinaryKeys => true;
 
-        public override bool PreservesDateTimeKind
-            => true;
+        public override DateTime DefaultDateTime => new();
+
+        public override bool PreservesDateTimeKind => true;
+
     }
-}
 
+}

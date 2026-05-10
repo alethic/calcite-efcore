@@ -5,12 +5,11 @@ using Xunit.Abstractions;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Associations.Navigations
 {
 
-    /// <inheritdoc/>
     public class NavigationsIncludeCalciteTest : NavigationsIncludeRelationalTestBase<NavigationsCalciteFixture>
     {
 
         /// <summary>
-        /// Initializes a new instnace.
+        /// Initializes a new instance.
         /// </summary>
         /// <param name="fixture"></param>
         /// <param name="testOutputHelper"></param>

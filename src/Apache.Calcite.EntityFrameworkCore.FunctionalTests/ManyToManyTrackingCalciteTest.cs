@@ -6,53 +6,20 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ModelBuilding;
 using Microsoft.EntityFrameworkCore.TestModels.ManyToManyModel;
 using Microsoft.EntityFrameworkCore.TestUtilities;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 
-public class ManyToManyTrackingCalciteTest(ManyToManyTrackingCalciteTest.ManyToManyTrackingCalciteFixture fixture)
-    : ManyToManyTrackingRelationalTestBase<ManyToManyTrackingCalciteTest.ManyToManyTrackingCalciteFixture>(fixture)
+public class ManyToManyTrackingCalciteTest(ManyToManyTrackingCalciteTest.ManyToManyTrackingCalciteFixture fixture) :
+    ManyToManyTrackingRelationalTestBase<ManyToManyTrackingCalciteTest.ManyToManyTrackingCalciteFixture>(fixture)
 {
+
     public class ManyToManyTrackingCalciteFixture : ManyToManyTrackingRelationalFixture, ITestSqlLoggerFactory
     {
-        public TestSqlLoggerFactory TestSqlLoggerFactory
-            => (TestSqlLoggerFactory)ListLoggerFactory;
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        public TestSqlLoggerFactory TestSqlLoggerFactory => (TestSqlLoggerFactory)ListLoggerFactory;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder, DbContext context)
-        {
-            base.OnModelCreating(modelBuilder, context);
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
-            modelBuilder
-                .Entity<JoinOneSelfPayload>()
-                .Property(e => e.Payload)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            modelBuilder
-                .SharedTypeEntity<Dictionary<string, object>>("JoinOneToThreePayloadFullShared")
-                .IndexerProperty<string>("Payload")
-                .HasDefaultValue("Generated");
-
-            modelBuilder
-                .Entity<JoinOneToThreePayloadFull>()
-                .Property(e => e.Payload)
-                .HasDefaultValue("Generated");
-
-            modelBuilder
-                .Entity<UnidirectionalJoinOneSelfPayload>()
-                .Property(e => e.Payload)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            modelBuilder
-                .SharedTypeEntity<Dictionary<string, object>>("UnidirectionalJoinOneToThreePayloadFullShared")
-                .IndexerProperty<string>("Payload")
-                .HasDefaultValue("Generated");
-
-            modelBuilder
-                .Entity<UnidirectionalJoinOneToThreePayloadFull>()
-                .Property(e => e.Payload)
-                .HasDefaultValue("Generated");
-        }
     }
-}
 
+}

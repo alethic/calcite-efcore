@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
@@ -10,77 +9,43 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
 
-public abstract class CommandInterceptionCalciteTestBase(CommandInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture)
-    : CommandInterceptionTestBase(fixture)
+public abstract class CommandInterceptionCalciteTestBase(CommandInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture) : CommandInterceptionTestBase(fixture)
 {
-    public override async Task<string> Intercept_query_passively(bool async, bool inject)
-    {
-        AssertSql(
-            """
-SELECT "s"."Id", "s"."Type" FROM "Singularity" AS "s"
-""",
-            await base.Intercept_query_passively(async, inject));
-
-        return null;
-    }
-
-    protected override async Task<string> QueryMutationTest<TInterceptor>(bool async, bool inject)
-    {
-        AssertSql(
-            """
-SELECT "s"."Id", "s"."Type" FROM "Brane" AS "s"
-""",
-            await base.QueryMutationTest<TInterceptor>(async, inject));
-
-        return null;
-    }
-
-    public override async Task<string> Intercept_query_to_replace_execution(bool async, bool inject)
-    {
-        AssertSql(
-            """
-SELECT "s"."Id", "s"."Type" FROM "Singularity" AS "s"
-""",
-            await base.Intercept_query_to_replace_execution(async, inject));
-
-        return null;
-    }
 
     public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
-        protected override string StoreName
-            => "CommandInterception";
+        protected override string StoreName => "CommandInterception";
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
-        protected override IServiceCollection InjectInterceptors(
-            IServiceCollection serviceCollection,
-            IEnumerable<IInterceptor> injectedInterceptors)
-            => base.InjectInterceptors(serviceCollection.AddEntityFrameworkCalcite(), injectedInterceptors);
+        protected override IServiceCollection InjectInterceptors(IServiceCollection serviceCollection, IEnumerable<IInterceptor> injectedInterceptors) => base.InjectInterceptors(serviceCollection.AddEntityFrameworkCalcite(), injectedInterceptors);
     }
 
-    public class CommandInterceptionCalciteTest(CommandInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : CommandInterceptionCalciteTestBase(fixture), IClassFixture<CommandInterceptionCalciteTest.InterceptionCalciteFixture>
+    public class CommandInterceptionCalciteTest(CommandInterceptionCalciteTest.InterceptionCalciteFixture fixture) :
+        CommandInterceptionCalciteTestBase(fixture), IClassFixture<CommandInterceptionCalciteTest.InterceptionCalciteFixture>
     {
         public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
-            protected override bool ShouldSubscribeToDiagnosticListener
-                => false;
+
+            protected override bool ShouldSubscribeToDiagnosticListener => false;
+
         }
+
     }
 
-    public class CommandInterceptionWithDiagnosticsCalciteTest(
-        CommandInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : CommandInterceptionCalciteTestBase(fixture), IClassFixture<CommandInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
+    public class CommandInterceptionWithDiagnosticsCalciteTest(CommandInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture) :
+        CommandInterceptionCalciteTestBase(fixture), IClassFixture<CommandInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
         public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
-            protected override bool ShouldSubscribeToDiagnosticListener
-                => true;
+
+            protected override bool ShouldSubscribeToDiagnosticListener => true;
+
         }
+
     }
 }
 

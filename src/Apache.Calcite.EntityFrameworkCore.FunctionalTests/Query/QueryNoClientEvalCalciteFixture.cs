@@ -8,8 +8,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
     public class QueryNoClientEvalCalciteFixture : NorthwindQueryCalciteFixture<NoopModelCustomizer>
     {
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
     }
 

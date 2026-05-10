@@ -42,4 +42,3 @@ public class MigrationsCalciteTest : MigrationsTestBase<MigrationsCalciteTest.Mi
     }
 
 }
-

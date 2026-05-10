@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.Storage;
 
 using Xunit.Abstractions;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Inheritance;
 
-public class InheritanceQueryCalciteTest(TPHInheritanceQueryCalciteFixture fixture, ITestOutputHelper testOutputHelper)
-    : TPHInheritanceQueryTestBase<TPHInheritanceQueryCalciteFixture>(fixture, testOutputHelper)
+public class InheritanceQueryCalciteTest(TPHInheritanceQueryCalciteFixture fixture, ITestOutputHelper testOutputHelper) :
+    TPHInheritanceQueryTestBase<TPHInheritanceQueryCalciteFixture>(fixture, testOutputHelper)
 {
-    protected override void UseTransaction(DatabaseFacade facade, IDbContextTransaction transaction)
-        => facade.UseTransaction(transaction.GetDbTransaction());
+    protected override void UseTransaction(DatabaseFacade facade, IDbContextTransaction transaction) => facade.UseTransaction(transaction.GetDbTransaction());
 }
 

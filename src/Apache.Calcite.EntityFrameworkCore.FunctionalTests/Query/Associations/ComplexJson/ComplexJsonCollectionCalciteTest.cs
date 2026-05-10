@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore.Query.Associations.ComplexJson;
 
 using Xunit.Abstractions;
+
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Associations.ComplexJson;
 
-public class ComplexJsonCollectionCalciteTest(ComplexJsonCalciteFixture fixture, ITestOutputHelper testOutputHelper)
-    : ComplexJsonCollectionRelationalTestBase<ComplexJsonCalciteFixture>(fixture, testOutputHelper);
+public class ComplexJsonCollectionCalciteTest(ComplexJsonCalciteFixture fixture, ITestOutputHelper testOutputHelper)    :
+    ComplexJsonCollectionRelationalTestBase<ComplexJsonCalciteFixture>(fixture, testOutputHelper);
 

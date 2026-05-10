@@ -19,4 +19,3 @@ public class NullSemanticsQueryCalciteTest : NullSemanticsQueryTestBase<NullSema
     }
 
 }
-
