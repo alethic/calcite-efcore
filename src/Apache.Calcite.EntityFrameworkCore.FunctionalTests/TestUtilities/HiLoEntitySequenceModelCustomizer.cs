@@ -2,6 +2,7 @@ using Apache.Calcite.EntityFrameworkCore.Extensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.ModelBuilding;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
 {

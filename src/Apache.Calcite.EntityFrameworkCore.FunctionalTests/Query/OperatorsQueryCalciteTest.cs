@@ -4,16 +4,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
-using Xunit.Abstractions;
-
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query
 {
 
     public class OperatorsQueryCalciteTest : OperatorsQueryTestBase
     {
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        public OperatorsQueryCalciteTest(NonSharedFixture fixture) : base(fixture)
+        {
+
+        }
+
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
 
     }
 

@@ -7,11 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="TestUtilities\Northwind.sql" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="TestUtilities\Northwind.sql" />
+      <Compile Remove="TestUtilities\**" />
+      <EmbeddedResource Remove="TestUtilities\**" />
+      <None Remove="TestUtilities\**" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,4 +1,4 @@
-﻿using java.math;
+using java.math;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities.NorthwindReflectiveSchema
 {

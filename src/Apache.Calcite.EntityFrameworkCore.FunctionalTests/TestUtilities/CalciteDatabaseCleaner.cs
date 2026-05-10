@@ -1,4 +1,4 @@
-﻿using Apache.Calcite.EntityFrameworkCore.Design.Internal;
+using Apache.Calcite.EntityFrameworkCore.Design.Internal;
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 
 using Microsoft.EntityFrameworkCore.Infrastructure;

@@ -1,8 +1,14 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using System;
+using System.Threading.Tasks;
+
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+
+using Xunit;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
 
 public class CustomConvertersCalciteTest : CustomConvertersTestBase<CustomConvertersCalciteTest.CustomConvertersCalciteFixture>
 {
@@ -10,7 +16,7 @@ public class CustomConvertersCalciteTest : CustomConvertersTestBase<CustomConver
         : base(fixture)
         => Fixture.TestSqlLoggerFactory.Clear();
 
-    // Disabled: SQLite database is case-sensitive
+    // Disabled: Calcite database is case-sensitive
     public override Task Can_insert_and_read_back_with_case_insensitive_string_key()
         => Task.CompletedTask;
 

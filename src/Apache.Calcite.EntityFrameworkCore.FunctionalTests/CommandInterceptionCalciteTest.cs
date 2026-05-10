@@ -1,10 +1,18 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
-namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-public abstract class CommandInterceptionSqliteTestBase(CommandInterceptionSqliteTestBase.InterceptionSqliteFixtureBase fixture)
+using Apache.Calcite.EntityFrameworkCore.Extensions;
+using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.Extensions.DependencyInjection;
+
+using Xunit;
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
+
+public abstract class CommandInterceptionCalciteTestBase(CommandInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture)
     : CommandInterceptionTestBase(fixture)
 {
     public override async Task<string> Intercept_query_passively(bool async, bool inject)
@@ -40,7 +48,7 @@ SELECT "s"."Id", "s"."Type" FROM "Singularity" AS "s"
         return null;
     }
 
-    public abstract class InterceptionSqliteFixtureBase : InterceptionFixtureBase
+    public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
         protected override string StoreName
             => "CommandInterception";
@@ -55,9 +63,9 @@ SELECT "s"."Id", "s"."Type" FROM "Singularity" AS "s"
     }
 
     public class CommandInterceptionCalciteTest(CommandInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : CommandInterceptionSqliteTestBase(fixture), IClassFixture<CommandInterceptionCalciteTest.InterceptionCalciteFixture>
+        : CommandInterceptionCalciteTestBase(fixture), IClassFixture<CommandInterceptionCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => false;
@@ -66,9 +74,9 @@ SELECT "s"."Id", "s"."Type" FROM "Singularity" AS "s"
 
     public class CommandInterceptionWithDiagnosticsCalciteTest(
         CommandInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : CommandInterceptionSqliteTestBase(fixture), IClassFixture<CommandInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
+        : CommandInterceptionCalciteTestBase(fixture), IClassFixture<CommandInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => true;

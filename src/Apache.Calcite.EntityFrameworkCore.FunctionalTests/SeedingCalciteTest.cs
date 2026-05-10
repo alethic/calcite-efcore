@@ -1,8 +1,9 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using Apache.Calcite.EntityFrameworkCore.Extensions;
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.TestUtilities;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
 
 public class SeedingCalciteTest : SeedingTestBase
 {
@@ -10,9 +11,9 @@ public class SeedingCalciteTest : SeedingTestBase
         => CalciteTestStore.Create("SeedingTest");
 
     protected override SeedingContext CreateContextWithEmptyDatabase(string testId)
-        => new SeedingSqliteContext(testId);
+        => new SeedingCalciteContext(testId);
 
-    protected class SeedingSqliteContext(string testId) : SeedingContext(testId)
+    protected class SeedingCalciteContext(string testId) : SeedingContext(testId)
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseCalcite(($"Data Source = Seeds{TestId}.db"));

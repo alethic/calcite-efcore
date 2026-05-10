@@ -1,8 +1,9 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+using System.Threading.Tasks;
+
+using Microsoft.EntityFrameworkCore.Query;
+
+using Xunit.Abstractions;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query;
-#nullable disable
 
 public class NorthwindQueryFiltersQueryCalciteTest : NorthwindQueryFiltersQueryTestBase<
     NorthwindQueryCalciteFixture<NorthwindQueryFiltersCustomizer>>

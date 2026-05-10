@@ -1,4 +1,4 @@
-﻿using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;

@@ -1,8 +1,17 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using System.Collections.Generic;
+
+using Apache.Calcite.EntityFrameworkCore.Extensions;
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.Extensions.DependencyInjection;
+
+using Xunit;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-public abstract class ConnectionInterceptionSqliteTestBase(ConnectionInterceptionSqliteTestBase.InterceptionSqliteFixtureBase fixture)
+
+public abstract class ConnectionInterceptionCalciteTestBase(ConnectionInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture)
     : ConnectionInterceptionTestBase(fixture)
 {
     protected override DbContextOptionsBuilder ConfigureProvider(DbContextOptionsBuilder optionsBuilder)
@@ -11,7 +20,7 @@ public abstract class ConnectionInterceptionSqliteTestBase(ConnectionInterceptio
     protected override BadUniverseContext CreateBadUniverse(DbContextOptionsBuilder optionsBuilder)
         => new(optionsBuilder.UseCalcite("Data Source=file:data.db?mode=invalidmode").Options);
 
-    public abstract class InterceptionSqliteFixtureBase : InterceptionFixtureBase
+    public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
         protected override string StoreName
             => "ConnectionInterception";
@@ -26,9 +35,9 @@ public abstract class ConnectionInterceptionSqliteTestBase(ConnectionInterceptio
     }
 
     public class ConnectionInterceptionCalciteTest(ConnectionInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : ConnectionInterceptionSqliteTestBase(fixture), IClassFixture<ConnectionInterceptionCalciteTest.InterceptionCalciteFixture>
+        : ConnectionInterceptionCalciteTestBase(fixture), IClassFixture<ConnectionInterceptionCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => false;
@@ -37,10 +46,10 @@ public abstract class ConnectionInterceptionSqliteTestBase(ConnectionInterceptio
 
     public class ConnectionInterceptionWithDiagnosticsCalciteTest(
         ConnectionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : ConnectionInterceptionSqliteTestBase(fixture),
+        : ConnectionInterceptionCalciteTestBase(fixture),
             IClassFixture<ConnectionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => true;

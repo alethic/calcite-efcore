@@ -1,13 +1,21 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
-namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
+using System.Collections.Generic;
 
-public abstract class SaveChangesInterceptionSqliteTestBase(SaveChangesInterceptionSqliteTestBase.InterceptionSqliteFixtureBase fixture)
-    : SaveChangesInterceptionTestBase(fixture)
+using Apache.Calcite.EntityFrameworkCore.Extensions;
+using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.Extensions.DependencyInjection;
+
+using Xunit;
+
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
+
+public abstract class SaveChangesInterceptionCalciteTestBase(SaveChangesInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture) :
+    SaveChangesInterceptionTestBase(fixture)
 {
-    public abstract class InterceptionSqliteFixtureBase : InterceptionFixtureBase
+    public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
         protected override string StoreName
             => "SaveChangesInterception";
@@ -22,9 +30,9 @@ public abstract class SaveChangesInterceptionSqliteTestBase(SaveChangesIntercept
     }
 
     public class SaveChangesInterceptionCalciteTest(SaveChangesInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : SaveChangesInterceptionSqliteTestBase(fixture), IClassFixture<SaveChangesInterceptionCalciteTest.InterceptionCalciteFixture>
+        : SaveChangesInterceptionCalciteTestBase(fixture), IClassFixture<SaveChangesInterceptionCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => false;
@@ -33,10 +41,10 @@ public abstract class SaveChangesInterceptionSqliteTestBase(SaveChangesIntercept
 
     public class SaveChangesInterceptionWithDiagnosticsCalciteTest(
         SaveChangesInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : SaveChangesInterceptionSqliteTestBase(fixture),
+        : SaveChangesInterceptionCalciteTestBase(fixture),
             IClassFixture<SaveChangesInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => true;

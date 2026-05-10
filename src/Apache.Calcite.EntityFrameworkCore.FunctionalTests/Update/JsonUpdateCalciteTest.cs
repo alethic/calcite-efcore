@@ -1,10 +1,11 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using System;
+using System.Threading.Tasks;
 
+using Microsoft.EntityFrameworkCore.Update;
+
+using Xunit;
 using Xunit.Sdk;
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Update;
-#nullable disable
 
 public class JsonUpdateCalciteTest : JsonUpdateTestBase<JsonUpdateCalciteFixture>
 {

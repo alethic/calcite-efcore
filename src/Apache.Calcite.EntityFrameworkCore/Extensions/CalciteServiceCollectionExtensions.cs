@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 
 using Apache.Calcite.EntityFrameworkCore.Diagnostics.Internal;
@@ -50,7 +50,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Extensions
         ///         Use this method when using dependency injection in your application, such as with ASP.NET Core.
         ///         For applications that don't use dependency injection, consider creating <see cref="DbContext" />
         ///         instances directly with its constructor. The <see cref="DbContext.OnConfiguring" /> method can then be
-        ///         overridden to configure the SQLite provider and connection string.
+        ///         overridden to configure the Calcite provider and connection string.
         ///     </para>
         ///     <para>
         ///         To configure the <see cref="DbContextOptions{TContext}" /> for the context, either override the

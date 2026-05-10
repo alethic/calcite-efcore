@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
+using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
 
 using Xunit.Abstractions;
 

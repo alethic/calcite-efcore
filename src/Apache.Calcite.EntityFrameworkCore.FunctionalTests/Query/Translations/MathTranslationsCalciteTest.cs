@@ -1,7 +1,12 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+using System.Threading.Tasks;
+
+using Microsoft.EntityFrameworkCore.Query.Translations;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+
+using Xunit;
+using Xunit.Abstractions;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Translations;
+
 public class MathTranslationsCalciteTest : MathTranslationsTestBase<BasicTypesQueryCalciteFixture>
 {
     public MathTranslationsCalciteTest(BasicTypesQueryCalciteFixture fixture, ITestOutputHelper testOutputHelper)
@@ -12,7 +17,7 @@ public class MathTranslationsCalciteTest : MathTranslationsTestBase<BasicTypesQu
     }
 
     public override async Task Abs_decimal()
-        => await AssertTranslationFailed(() => base.Abs_decimal()); // SQLite decimal support
+        => await AssertTranslationFailed(() => base.Abs_decimal()); // Calcite decimal support
 
     public override async Task Abs_int()
     {
@@ -75,7 +80,7 @@ WHERE ceiling("b"."Float") = 9
     }
 
     public override async Task Floor_decimal()
-        => await AssertTranslationFailed(() => base.Floor_decimal()); // SQLite decimal support
+        => await AssertTranslationFailed(() => base.Floor_decimal()); // Calcite decimal support
 
     public override async Task Floor_double()
     {
@@ -126,7 +131,7 @@ WHERE pow("b"."Float", 2) > 73 AND pow("b"."Float", 2) < 74
     }
 
     public override async Task Round_decimal()
-        => await AssertTranslationFailed(() => base.Round_decimal()); // SQLite decimal support
+        => await AssertTranslationFailed(() => base.Round_decimal()); // Calcite decimal support
 
     public override async Task Round_double()
     {
@@ -163,7 +168,7 @@ FROM "BasicTypesEntities" AS "b"
     }
 
     public override async Task Round_with_digits_decimal()
-        => await AssertTranslationFailed(() => base.Round_with_digits_decimal()); // SQLite decimal support
+        => await AssertTranslationFailed(() => base.Round_with_digits_decimal()); // Calcite decimal support
 
     public override async Task Round_with_digits_double()
     {
@@ -190,7 +195,7 @@ WHERE round("b"."Float", 1) = 255.09999999999999
     }
 
     public override async Task Truncate_decimal()
-        => await AssertTranslationFailed(() => base.Truncate_decimal()); // SQLite decimal support
+        => await AssertTranslationFailed(() => base.Truncate_decimal()); // Calcite decimal support
 
     public override async Task Truncate_double()
     {

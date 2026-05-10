@@ -1,10 +1,15 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using System.Linq;
+using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore.TestModels.UpdatesModel;
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.TestModels.UpdatesModel;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.EntityFrameworkCore.Update;
+
+using Xunit;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Update;
-#nullable disable
 
 public class UpdatesCalciteTest(UpdatesCalciteTest.UpdatesCalciteFixture fixture)
     : UpdatesRelationalTestBase<UpdatesCalciteTest.UpdatesCalciteFixture>(fixture)

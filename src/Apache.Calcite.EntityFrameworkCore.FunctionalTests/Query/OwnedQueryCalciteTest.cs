@@ -1,19 +1,20 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
-namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query;
-#nullable disable
 
-public class OwnedQueryCalciteTest(OwnedQueryCalciteTest.OwnedQueryCalciteFixture fixture)
-    : OwnedQueryRelationalTestBase<OwnedQueryCalciteTest.OwnedQueryCalciteFixture>(fixture)
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query;
+
+public class OwnedQueryCalciteTest(OwnedQueryCalciteTest.OwnedQueryCalciteFixture fixture) :
+    OwnedQueryRelationalTestBase<OwnedQueryCalciteTest.OwnedQueryCalciteFixture>(fixture)
 {
     public class OwnedQueryCalciteFixture : RelationalOwnedQueryFixture
     {
-        public override DbContextOptionsBuilder AddOptions(DbContextOptionsBuilder builder)
-            => base.AddOptions(builder.ConfigureWarnings(b => b.Ignore(SqliteEventId.CompositeKeyWithValueGeneration)));
 
-        protected override ITestStoreFactory TestStoreFactory
-            => CalciteTestStoreFactory.Instance;
+        protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;
+
     }
+
 }
 

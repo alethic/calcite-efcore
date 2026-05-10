@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query.Inheritance;
 
-public class TPTRelationshipsQueryCalciteTest : TPTRelationshipsQueryTestBase<TPTRelationshipsQueryCalciteTest.TPTRelationshipsQuerySqliteFixture>
+public class TPTRelationshipsQueryCalciteTest : TPTRelationshipsQueryTestBase<TPTRelationshipsQueryCalciteTest.TPTRelationshipsQueryCalciteFixture>
 {
 
-    public TPTRelationshipsQueryCalciteTest(TPTRelationshipsQuerySqliteFixture fixture) :
+    public TPTRelationshipsQueryCalciteTest(TPTRelationshipsQueryCalciteFixture fixture) :
         base(fixture)
     {
 
     }
 
-    public class TPTRelationshipsQuerySqliteFixture : TPTRelationshipsQueryRelationalFixture
+    public class TPTRelationshipsQueryCalciteFixture : TPTRelationshipsQueryRelationalFixture
     {
 
         protected override ITestStoreFactory TestStoreFactory => CalciteTestStoreFactory.Instance;

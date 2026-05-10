@@ -1,12 +1,9 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+using Microsoft.EntityFrameworkCore.Query;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Query;
-#nullable disable
 
 public class ManyToManyNoTrackingSplitQueryCalciteTest(ManyToManySplitQueryCalciteFixture fixture)
     : ManyToManyNoTrackingQueryRelationalTestBase<ManyToManySplitQueryCalciteFixture>(fixture)
 {
-    // Sqlite does not support Apply operations
+    // Calcite does not support Apply operations
 }
 

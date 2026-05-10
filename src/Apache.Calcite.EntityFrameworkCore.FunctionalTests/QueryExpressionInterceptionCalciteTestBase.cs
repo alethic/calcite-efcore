@@ -1,14 +1,21 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
-namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
+using System.Collections.Generic;
 
-public abstract class QueryExpressionInterceptionSqliteTestBase(
-    QueryExpressionInterceptionSqliteTestBase.InterceptionSqliteFixtureBase fixture)
+using Apache.Calcite.EntityFrameworkCore.Extensions;
+using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.Extensions.DependencyInjection;
+
+using Xunit;
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
+
+public abstract class QueryExpressionInterceptionCalciteTestBase(
+    QueryExpressionInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture)
     : QueryExpressionInterceptionTestBase(fixture)
 {
-    public abstract class InterceptionSqliteFixtureBase : InterceptionFixtureBase
+    public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
         protected override ITestStoreFactory TestStoreFactory
             => CalciteTestStoreFactory.Instance;
@@ -20,9 +27,9 @@ public abstract class QueryExpressionInterceptionSqliteTestBase(
     }
 
     public class QueryExpressionInterceptionCalciteTest(QueryExpressionInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : QueryExpressionInterceptionSqliteTestBase(fixture), IClassFixture<QueryExpressionInterceptionCalciteTest.InterceptionCalciteFixture>
+        : QueryExpressionInterceptionCalciteTestBase(fixture), IClassFixture<QueryExpressionInterceptionCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override string StoreName
                 => "QueryExpressionInterception";
@@ -34,10 +41,10 @@ public abstract class QueryExpressionInterceptionSqliteTestBase(
 
     public class QueryExpressionInterceptionWithDiagnosticsCalciteTest(
         QueryExpressionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : QueryExpressionInterceptionSqliteTestBase(fixture),
+        : QueryExpressionInterceptionCalciteTestBase(fixture),
             IClassFixture<QueryExpressionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override string StoreName
                 => "QueryExpressionInterceptionWithDiagnostics";

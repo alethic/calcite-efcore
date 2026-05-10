@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestModels.Northwind;
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;

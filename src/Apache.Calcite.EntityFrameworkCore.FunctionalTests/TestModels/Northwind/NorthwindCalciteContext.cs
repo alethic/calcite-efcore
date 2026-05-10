@@ -1,6 +1,7 @@
-﻿using Apache.Calcite.EntityFrameworkCore.Extensions;
+using Apache.Calcite.EntityFrameworkCore.Extensions;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ModelBuilding;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestModels.Northwind

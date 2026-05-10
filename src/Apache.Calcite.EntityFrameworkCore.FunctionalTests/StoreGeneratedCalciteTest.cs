@@ -1,8 +1,16 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using System.Threading.Tasks;
+
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.ModelBuilding;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+
+using Xunit;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
 
 public class StoreGeneratedCalciteTest(StoreGeneratedCalciteTest.StoreGeneratedCalciteFixture fixture)
     : StoreGeneratedTestBase<StoreGeneratedCalciteTest.StoreGeneratedCalciteFixture>(fixture)

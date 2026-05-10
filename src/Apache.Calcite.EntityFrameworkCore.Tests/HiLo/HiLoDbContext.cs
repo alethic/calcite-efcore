@@ -1,3 +1,6 @@
+using System.Data.Common;
+
+using Apache.Calcite.Data;
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 
 using IKVM.Jdbc.Data;
@@ -10,10 +13,16 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
     public class HiLoDbContext : DbContext
     {
 
-        readonly JdbcConnection _connection;
+        readonly DbConnection _connection;
         readonly string _schema;
 
         public HiLoDbContext(JdbcConnection connection, string schema)
+        {
+            _connection = connection;
+            _schema = schema;
+        }
+
+        public HiLoDbContext(CalciteConnection connection, string schema)
         {
             _connection = connection;
             _schema = schema;
@@ -30,7 +39,17 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseCalcite(_connection, b => b.MaxBatchSize(1));
+            switch (_connection)
+            {
+                case CalciteConnection calcite:
+                    optionsBuilder.UseCalcite(calcite, b => b.MaxBatchSize(1));
+                    break;
+                case JdbcConnection jdbc:
+                    optionsBuilder.UseCalcite(jdbc, b => b.MaxBatchSize(1));
+                    break;
+                default:
+                    throw new System.InvalidOperationException("Unsupported connection type.");
+            }
         }
 
     }

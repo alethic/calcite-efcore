@@ -1,8 +1,16 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using System.Threading.Tasks;
+
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+
+using Xunit;
+using Xunit.Abstractions;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
 
 public class DataAnnotationCalciteTest : DataAnnotationRelationalTestBase<DataAnnotationCalciteTest.DataAnnotationCalciteFixture>
 {
@@ -150,7 +158,7 @@ RETURNING "Unique_No";
 """);
     }
 
-    // Sqlite does not support length
+    // Calcite does not support length
     public override Task MaxLengthAttribute_throws_while_inserting_value_longer_than_max_length()
     {
         using var context = CreateContext();
@@ -158,7 +166,7 @@ RETURNING "Unique_No";
         return Task.CompletedTask;
     }
 
-    // Sqlite does not support length
+    // Calcite does not support length
     public override Task StringLengthAttribute_throws_while_inserting_value_longer_than_max_length()
     {
         using var context = CreateContext();
@@ -166,7 +174,7 @@ RETURNING "Unique_No";
         return Task.CompletedTask;
     }
 
-    // Sqlite does not support rowversion. See issue #2195
+    // Calcite does not support rowversion. See issue #2195
     public override Task TimestampAttribute_throws_if_value_in_database_changed()
     {
         using var context = CreateContext();

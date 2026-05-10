@@ -1,13 +1,20 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
-namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
-#nullable disable
+using System.Collections.Generic;
 
-public abstract class TransactionInterceptionSqliteTestBase(TransactionInterceptionSqliteTestBase.InterceptionSqliteFixtureBase fixture)
+using Apache.Calcite.EntityFrameworkCore.Extensions;
+using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.Extensions.DependencyInjection;
+
+using Xunit;
+namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests;
+
+public abstract class TransactionInterceptionCalciteTestBase(TransactionInterceptionCalciteTestBase.InterceptionCalciteFixtureBase fixture)
     : TransactionInterceptionTestBase(fixture)
 {
-    public abstract class InterceptionSqliteFixtureBase : InterceptionFixtureBase
+    public abstract class InterceptionCalciteFixtureBase : InterceptionFixtureBase
     {
         protected override string StoreName
             => "TransactionInterception";
@@ -22,9 +29,9 @@ public abstract class TransactionInterceptionSqliteTestBase(TransactionIntercept
     }
 
     public class TransactionInterceptionCalciteTest(TransactionInterceptionCalciteTest.InterceptionCalciteFixture fixture)
-        : TransactionInterceptionSqliteTestBase(fixture), IClassFixture<TransactionInterceptionCalciteTest.InterceptionCalciteFixture>
+        : TransactionInterceptionCalciteTestBase(fixture), IClassFixture<TransactionInterceptionCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => false;
@@ -33,10 +40,10 @@ public abstract class TransactionInterceptionSqliteTestBase(TransactionIntercept
 
     public class TransactionInterceptionWithDiagnosticsCalciteTest(
         TransactionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture fixture)
-        : TransactionInterceptionSqliteTestBase(fixture),
+        : TransactionInterceptionCalciteTestBase(fixture),
             IClassFixture<TransactionInterceptionWithDiagnosticsCalciteTest.InterceptionCalciteFixture>
     {
-        public class InterceptionCalciteFixture : InterceptionSqliteFixtureBase
+        public class InterceptionCalciteFixture : InterceptionCalciteFixtureBase
         {
             protected override bool ShouldSubscribeToDiagnosticListener
                 => true;

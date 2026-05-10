@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
@@ -230,7 +230,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Query.Internal
                     {
                         // Generate: WHERE instance IS NOT NULL AND pattern IS NOT NULL AND (substr(instance, -length(pattern)) = pattern OR pattern = '')
                         // Note that the empty string pattern needs special handling, since in .NET it returns true for all non-null
-                        // instances, but substr(instance, 0) returns the entire string in SQLite.
+                        // instances, but substr(instance, 0) returns the entire string in Calcite.
                         // Note that we compensate for the case where both the instance and the pattern are null (null.StartsWith(null)); a
                         // simple equality would yield true in that case, but we want false. We technically
                         return

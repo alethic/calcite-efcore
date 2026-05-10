@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Linq;
 
 using java.math;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.TestModels.Northwind;
 
 using org.apache.calcite.adapter.java;

@@ -1,7 +1,11 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
+using System.Threading.Tasks;
+
 using Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities;
+
+using Microsoft.EntityFrameworkCore.TestUtilities;
+using Microsoft.EntityFrameworkCore.Update;
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.Update;
+
 public class ComplexCollectionJsonUpdateCalciteTest : ComplexCollectionJsonUpdateTestBase<
     ComplexCollectionJsonUpdateCalciteTest.ComplexCollectionJsonUpdateCalciteFixture>
 {
