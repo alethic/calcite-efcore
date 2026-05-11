@@ -7,12 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="TestUtilities\**" />
-      <EmbeddedResource Remove="TestUtilities\**" />
-      <None Remove="TestUtilities\**" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="IKVM" Version="8.15.0" />
         <PackageReference Include="IKVM.Maven.Sdk" Version="1.11.0">
             <PrivateAssets>all</PrivateAssets>
@@ -31,16 +25,12 @@
         <MavenReference Include="org.apache.calcite:calcite-linq4j" Version="$(CalciteVersion)" />
         <MavenReference Include="org.apache.calcite:calcite-core" Version="$(CalciteVersion)" />
         <MavenReference Include="org.apache.calcite:calcite-server" Version="$(CalciteVersion)" />
+        <MavenReference Include="org.apache.calcite:calcite-csv" Version="$(CalciteVersion)" />
+        <MavenReference Include="org.apache.calcite:calcite-file" Version="$(CalciteVersion)" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Apache.Calcite.EntityFrameworkCore\Apache.Calcite.EntityFrameworkCore.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Update="northwind.db">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +27,12 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         public override TestStore GetOrCreate(string storeName) => CalciteTestStore.GetOrCreate(storeName);
 
         /// <inheritdoc/>
-        public override IServiceCollection AddProviderServices(IServiceCollection serviceCollection) => serviceCollection.AddEntityFrameworkCalcite();
+        public override IServiceCollection AddProviderServices(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddEntityFrameworkCalcite();
+            serviceCollection.AddSingleton<IModelCustomizer, HiLoEntitySequenceModelCustomizer>();
+            return serviceCollection;
+        }
 
     }
 

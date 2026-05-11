@@ -14,7 +14,6 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.Csv
         static CsvDbContext()
         {
             ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.adapter.csv.CsvSchemaFactory).Assembly);
-            ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.jdbc.Driver).Assembly);
         }
 
         public DbSet<CsvEmployee> Employees { get; set; }
@@ -31,7 +30,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.Csv
         /// <inheritdoc />
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseCalcite("jdbc:calcite:model=Csv/model.json", o =>
+            optionsBuilder.UseCalcite("model=Csv/model.json", o =>
             {
 
             });

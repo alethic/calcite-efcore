@@ -20,7 +20,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         }
 
         /// <inheritdoc/>
-        public override string StatementTerminator => ";";
+        public override string StatementTerminator => "";
 
         /// <inheritdoc/>
         public override string GenerateParameterName(string name) => name;

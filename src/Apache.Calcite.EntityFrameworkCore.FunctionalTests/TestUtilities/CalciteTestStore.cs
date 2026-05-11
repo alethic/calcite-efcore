@@ -6,6 +6,7 @@ using Apache.Calcite.Data;
 using Apache.Calcite.EntityFrameworkCore.Extensions;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
@@ -23,24 +24,30 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         /// Creates the specified store.
         /// </summary>
         public static CalciteTestStore Create(string name)
-            => new(name, shared: false);
+        {
+            return new(name, shared: false);
+        }
 
         /// <summary>
         /// Gets or creates the specified store.
         /// </summary>
         public static CalciteTestStore GetOrCreate(string name)
-            => new(name, shared: true);
+        {
+            return new(name, shared: true);
+        }
 
         static string BuildConnectionString(string name)
-            => $"schema={name};conformance=LENIENT;parserFactory=org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
+        {
+            return $"conformance=LENIENT;parserFactory=org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
+        }
 
         readonly string? _initScript;
 
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
-        protected CalciteTestStore(string name, bool shared, string? initScript = null)
-            : base(name, shared, new CalciteConnection(BuildConnectionString(name)))
+        protected CalciteTestStore(string name, bool shared, string? initScript = null) :
+            base(name, shared, new CalciteConnection(BuildConnectionString(name)))
         {
             _initScript = initScript;
         }
@@ -50,21 +57,23 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         {
             if (UseConnectionString)
             {
-                return builder.UseCalcite(ConnectionString, b =>
-                {
-                    b.CommandTimeout(CommandTimeout);
-                    b.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
-                });
+                return builder
+                    .UseCalcite(ConnectionString, b =>
+                    {
+                        b.CommandTimeout(CommandTimeout);
+                        b.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
+                    });
             }
 
             if (Connection is not CalciteConnection connection)
                 throw new InvalidOperationException("Calcite Provider must be provided a CalciteConnection.");
 
-            return builder.UseCalcite(connection, b =>
-            {
-                b.CommandTimeout(CommandTimeout);
-                b.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
-            });
+            return builder
+                .UseCalcite(connection, b =>
+                {
+                    b.CommandTimeout(CommandTimeout);
+                    b.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery);
+                });
         }
 
         /// <inheritdoc/>

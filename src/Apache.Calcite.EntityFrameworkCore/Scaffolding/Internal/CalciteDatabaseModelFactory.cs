@@ -5,6 +5,8 @@ using System.Data.Common;
 
 using Apache.Calcite.Data;
 
+using java.lang;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Scaffolding;
@@ -74,7 +76,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
 
             var typeFactory = connection.TypeFactory;
 
-            foreach (var schema in EnumerateSchemas(connection.RootSchema))
+            foreach (var schema in GetSchemas(connection.RootSchema))
                 foreach (var table in GetTables(model, schema, typeFactory))
                     model.Tables.Add(table);
 
@@ -86,17 +88,21 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        static IEnumerable<SchemaPlus> EnumerateSchemas(SchemaPlus root)
+        static IEnumerable<SchemaPlus> GetSchemas(SchemaPlus root)
         {
             yield return root;
 
-            foreach (var name in root.getSubSchemaNames().toArray())
+            foreach (var name in root.getSubSchemaNames().AsEnumerable<string>())
             {
-                var sub = root.getSubSchema((string)name);
+                // skip built in metadata schema
+                if (name == "metadata")
+                    continue;
+
+                var sub = root.getSubSchema(name);
                 if (sub is null)
                     continue;
 
-                foreach (var nested in EnumerateSchemas(sub))
+                foreach (var nested in GetSchemas(sub))
                     yield return nested;
             }
         }
@@ -110,9 +116,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
         /// <returns></returns>
         IEnumerable<DatabaseTable> GetTables(DatabaseModel database, SchemaPlus schema, org.apache.calcite.adapter.java.JavaTypeFactory typeFactory)
         {
-            foreach (var name in schema.getTableNames().toArray())
+            foreach (var tableName in schema.getTableNames().AsEnumerable<string>())
             {
-                var tableName = (string)name;
                 var table = schema.getTable(tableName);
                 if (table is null)
                     continue;
@@ -152,14 +157,12 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
         /// <returns></returns>
         IEnumerable<DatabaseColumn> GetColumns(DatabaseTable table, RelDataType rowType)
         {
-            foreach (var field in rowType.getFieldList().toArray())
+            foreach (var field in rowType.getFieldList().AsEnumerable<RelDataTypeField>())
             {
-                var f = (RelDataTypeField)field;
-                var fieldType = f.getType();
-
+                var fieldType = field.getType();
                 var column = new DatabaseColumn();
                 column.Table = table;
-                column.Name = f.getName();
+                column.Name = field.getName();
                 column.IsNullable = fieldType.isNullable();
                 column.StoreType = fieldType.getSqlTypeName().getName();
                 yield return column;

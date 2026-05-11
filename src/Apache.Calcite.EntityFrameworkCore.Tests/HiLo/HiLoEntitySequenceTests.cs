@@ -1,17 +1,10 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
-using IKVM.Jdbc.Data;
+using Apache.Calcite.Data;
 
-using java.sql;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using org.apache.calcite.adapter.java;
-using org.apache.calcite.jdbc;
-using org.apache.calcite.sql.validate;
+using Xunit;
 
 namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
 {
@@ -19,13 +12,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
     /// <summary>
     /// Tests covering the EntitySequenceHiLo value-generation strategy against a live in-memory Calcite store.
     /// </summary>
-    [TestClass]
     public class HiLoEntitySequenceTests
     {
-
-        static readonly org.apache.calcite.jdbc.Driver CalciteJdbcDriver;
-        static readonly CalciteJdbc41Factory CalciteJdbc41Factory;
-        static readonly MethodInfo NewConnectionMethod;
 
         static HiLoEntitySequenceTests()
         {
@@ -33,39 +21,21 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
             ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.server.ServerDdlExecutor).Assembly);
             ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.joou.ULong).Assembly);
             ikvm.runtime.Startup.addBootClassPathAssembly(typeof(org.apache.calcite.linq4j.tree.BlockBuilder).Assembly);
-
-            CalciteJdbcDriver = (org.apache.calcite.jdbc.Driver)DriverManager.getDriver("jdbc:calcite:");
-            CalciteJdbc41Factory = new CalciteJdbc41Factory();
-            NewConnectionMethod = typeof(CalciteJdbc41Factory)
-                .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                .First(i => i.Name == nameof(CalciteJdbc41Factory.newConnection) && i.GetParameters().Length == 6);
-        }
-
-        static Connection InvokeNewConnection(string url, java.util.Properties info, CalciteSchema rootSchema, JavaTypeFactory typeFactory)
-        {
-            return (Connection?)NewConnectionMethod.Invoke(CalciteJdbc41Factory, [CalciteJdbcDriver, CalciteJdbc41Factory, url, info, rootSchema, typeFactory])
-                ?? throw new InvalidOperationException();
         }
 
         /// <summary>
         /// Creates a fresh in-memory Calcite JDBC connection backed by a unique schema.
         /// </summary>
-        static JdbcConnection CreateConnection(string schema)
+        static CalciteConnection CreateConnection(string schema)
         {
-            var properties = new java.util.Properties();
-            properties.setProperty("schema", schema);
-            properties.setProperty("conformance", SqlConformanceEnum.LENIENT.name());
-            properties.setProperty("parserFactory", "org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY");
-
-            using var tmp = DriverManager.getConnection("jdbc:calcite:");
-            var calcite = (CalciteConnection)tmp.unwrap(typeof(CalciteConnection));
-            var rootSchema = CalciteSchema.from(calcite.getRootSchema());
-            var typeFactory = calcite.getTypeFactory();
-
-            return new JdbcConnection(() => InvokeNewConnection("jdbc:calcite:", properties, rootSchema, typeFactory));
+            var str = new CalciteConnectionStringBuilder();
+            str.Schema = schema;
+            str.Conformance = "LENIENT";
+            str["parserFactory"] = "org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
+            return new CalciteConnection(str.ToString());
         }
 
-        static async Task<(JdbcConnection Connection, HiLoDbContext Context, string Schema)> CreateAndInitializeAsync()
+        static async Task<(CalciteConnection Connection, HiLoDbContext Context, string Schema)> CreateAndInitializeAsync()
         {
             var schema = "S" + Guid.NewGuid().ToString("N");
             var conn = CreateConnection(schema);
@@ -74,7 +44,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
             return (conn, ctx, schema);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Sequence_table_is_created()
         {
             var (conn, ctx, _) = await CreateAndInitializeAsync();
@@ -87,8 +57,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
                 var schema = conn.Database;
 
                 using var cmd = conn.CreateCommand();
-                cmd.CommandText =
-                    "SELECT \"tableSchem\", \"tableName\", \"tableType\" FROM \"metadata\".\"TABLES\"";
+                cmd.CommandText = "SELECT \"tableSchem\", \"tableName\", \"tableType\" FROM \"metadata\".\"TABLES\"";
 
                 var found = new System.Collections.Generic.List<string>();
                 using (var reader = cmd.ExecuteReader())
@@ -102,13 +71,13 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
                     }
                 }
 
-                Assert.IsTrue(
+                Assert.True(
                     found.Exists(t => t.Contains(".CalciteSequence ")),
                     $"EnsureCreated should have created the CalciteSequence backing table in schema '{schema}'. All metadata.TABLES rows: [{string.Join(", ", found)}]");
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Can_insert_with_generated_keys()
         {
             var (conn, ctx, _) = await CreateAndInitializeAsync();
@@ -119,13 +88,13 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
                 ctx.Products.Add(new Product { Name = "Gadget", Price = 19.99m });
                 await ctx.SaveChangesAsync();
 
-                Assert.AreEqual(2, ctx.Products.Count());
+                Assert.Equal(2, ctx.Products.Count());
                 foreach (var p in ctx.Products)
-                    Assert.IsTrue(p.Id > 0, "HiLo sequence should have produced a non-zero key.");
+                    Assert.True(p.Id > 0, "HiLo sequence should have produced a non-zero key.");
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Generated_keys_are_unique()
         {
             var (conn, ctx, _) = await CreateAndInitializeAsync();
@@ -138,12 +107,12 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
                 await ctx.SaveChangesAsync();
 
                 var ids = ctx.Products.Select(p => p.Id).ToList();
-                CollectionAssert.AllItemsAreUnique(ids);
-                Assert.IsTrue(ids.TrueForAll(id => id > 0));
+                Assert.Distinct(ids);
+                Assert.True(ids.TrueForAll(id => id > 0));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Can_select_inserted_rows()
         {
             var (conn, ctx, _) = await CreateAndInitializeAsync();
@@ -156,14 +125,14 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
                 await ctx.SaveChangesAsync();
 
                 var names = ctx.Products.OrderBy(p => p.Name).Select(p => p.Name).ToList();
-                CollectionAssert.AreEqual(new[] { "Alpha", "Beta", "Gamma" }, names);
+                Assert.Equal(new[] { "Alpha", "Beta", "Gamma" }, names);
 
                 var beta = ctx.Products.Single(p => p.Name == "Beta");
-                Assert.AreEqual(2m, beta.Price);
+                Assert.Equal(2m, beta.Price);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public async Task Can_update_inserted_rows()
         {
             var (conn, ctx, schema) = await CreateAndInitializeAsync();
@@ -175,7 +144,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
                 await ctx.SaveChangesAsync();
 
                 var id = product.Id;
-                Assert.IsTrue(id > 0);
+                Assert.True(id > 0);
 
                 product.Name = "Updated";
                 product.Price = 7.5m;
@@ -186,8 +155,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
             using (var verify = new HiLoDbContext(conn, schema))
             {
                 var loaded = verify.Products.Single();
-                Assert.AreEqual("Updated", loaded.Name);
-                Assert.AreEqual(7.5m, loaded.Price);
+                Assert.Equal("Updated", loaded.Name);
+                Assert.Equal(7.5m, loaded.Price);
             }
         }
 
