@@ -8,14 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="TestUtilities\Northwind.sql" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="TestUtilities\Northwind.sql" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Include="IKVM" Version="8.15.0" />
         <PackageReference Include="IKVM.Maven.Sdk" Version="1.11.0">
             <PrivateAssets>all</PrivateAssets>
