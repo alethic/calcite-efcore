@@ -17,7 +17,6 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
     public class CalciteDatabaseCreator : RelationalDatabaseCreator
     {
 
-        readonly ICalciteConnection _connection;
         readonly IRawSqlCommandBuilder _rawSqlCommandBuilder;
         readonly ISqlGenerationHelper _sqlGenerationHelper;
 
@@ -25,13 +24,11 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         /// Initializes a new instance.
         /// </summary>
         /// <param name="dependencies"></param>
-        /// <param name="connection"></param>
         /// <param name="rawSqlCommandBuilder"></param>
         /// <param name="sqlGenerationHelper"></param>
-        public CalciteDatabaseCreator(RelationalDatabaseCreatorDependencies dependencies, ICalciteConnection connection, IRawSqlCommandBuilder rawSqlCommandBuilder, ISqlGenerationHelper sqlGenerationHelper) :
+        public CalciteDatabaseCreator(RelationalDatabaseCreatorDependencies dependencies, IRawSqlCommandBuilder rawSqlCommandBuilder, ISqlGenerationHelper sqlGenerationHelper) :
             base(dependencies)
         {
-            _connection = connection;
             _rawSqlCommandBuilder = rawSqlCommandBuilder;
             _sqlGenerationHelper = sqlGenerationHelper;
         }
@@ -51,7 +48,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         /// <inheritdoc/>
         public override bool HasTables()
             => Dependencies.ExecutionStrategy.Execute(
-                _connection,
+                Dependencies.Connection,
                 connection =>
                 {
                     connection.Open();
@@ -77,7 +74,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
         /// <inheritdoc/>
         public override async Task<bool> HasTablesAsync(CancellationToken cancellationToken = default)
             => (long)(await Dependencies.ExecutionStrategy.ExecuteAsync(
-                _connection,
+                Dependencies.Connection,
                 async (connection, ct) =>
                 {
                     await connection.OpenAsync(ct).ConfigureAwait(false);
@@ -152,7 +149,7 @@ WHERE ""tableType"" = 'TABLE'
             if (commands.Count == 0)
                 return;
 
-            _connection.Open();
+            Dependencies.Connection.Open();
             try
             {
                 foreach (var sql in commands)
@@ -160,7 +157,7 @@ WHERE ""tableType"" = 'TABLE'
             }
             finally
             {
-                _connection.Close();
+                Dependencies.Connection.Close();
             }
         }
 
@@ -170,7 +167,7 @@ WHERE ""tableType"" = 'TABLE'
             if (commands.Count == 0)
                 return;
 
-            await _connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+            await Dependencies.Connection.OpenAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 foreach (var sql in commands)
@@ -178,7 +175,7 @@ WHERE ""tableType"" = 'TABLE'
             }
             finally
             {
-                await _connection.CloseAsync().ConfigureAwait(false);
+                await Dependencies.Connection.CloseAsync().ConfigureAwait(false);
             }
         }
 
@@ -186,7 +183,7 @@ WHERE ""tableType"" = 'TABLE'
         {
             _rawSqlCommandBuilder.Build(sql).ExecuteNonQuery(
                 new RelationalCommandParameterObject(
-                    _connection,
+                    Dependencies.Connection,
                     null,
                     null,
                     Dependencies.CurrentContext.Context,
@@ -198,7 +195,7 @@ WHERE ""tableType"" = 'TABLE'
         {
             return _rawSqlCommandBuilder.Build(sql).ExecuteNonQueryAsync(
                 new RelationalCommandParameterObject(
-                    _connection,
+                    Dependencies.Connection,
                     null,
                     null,
                     Dependencies.CurrentContext.Context,
