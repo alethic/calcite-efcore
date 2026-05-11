@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage;
 
-using org.omg.PortableInterceptor;
-
 namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 {
 
