@@ -2,7 +2,6 @@ using Apache.Calcite.EntityFrameworkCore.Extensions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.ModelBuilding;
 
 namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
 {
@@ -33,10 +32,6 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
         public override void Customize(ModelBuilder modelBuilder, DbContext context)
         {
             base.Customize(modelBuilder, context);
-
-            if (modelBuilder.Model.GetDefaultSchema() is null)
-                modelBuilder.HasDefaultSchema(context.GetType().Name);
-
             modelBuilder.UseHiLoEntitySequence();
         }
 

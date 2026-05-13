@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Apache.Calcite.Data;
 using Apache.Calcite.EntityFrameworkCore.Metadata;
 using Apache.Calcite.EntityFrameworkCore.Metadata.Internal;
+
+using java.lang;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -47,22 +49,16 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
 
         /// <inheritdoc/>
         public override bool HasTables()
-            => Dependencies.ExecutionStrategy.Execute(
+        {
+            return Dependencies.ExecutionStrategy.Execute(
                 Dependencies.Connection,
                 connection =>
                 {
                     connection.Open();
+
                     try
                     {
-                        return (long)CreateHasTablesCommand(connection)
-                                .ExecuteScalar(
-                                    new RelationalCommandParameterObject(
-                                        connection,
-                                        null,
-                                        null,
-                                        Dependencies.CurrentContext.Context,
-                                        Dependencies.CommandLogger, CommandSource.Migrations))!
-                            != 0;
+                        return HasUserTables((CalciteConnection)connection.DbConnection);
                     }
                     finally
                     {
@@ -70,25 +66,20 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
                     }
                 },
                 null);
+        }
 
         /// <inheritdoc/>
         public override async Task<bool> HasTablesAsync(CancellationToken cancellationToken = default)
-            => (long)(await Dependencies.ExecutionStrategy.ExecuteAsync(
+        {
+            return await Dependencies.ExecutionStrategy.ExecuteAsync(
                 Dependencies.Connection,
                 async (connection, ct) =>
                 {
                     await connection.OpenAsync(ct).ConfigureAwait(false);
+
                     try
                     {
-                        return (await CreateHasTablesCommand(connection)
-                            .ExecuteScalarAsync(
-                                new RelationalCommandParameterObject(
-                                    connection,
-                                    null,
-                                    null,
-                                    Dependencies.CurrentContext.Context,
-                                    Dependencies.CommandLogger, CommandSource.Migrations),
-                                cancellationToken: ct).ConfigureAwait(false))!;
+                        return HasUserTables((CalciteConnection)connection.DbConnection);
                     }
                     finally
                     {
@@ -96,21 +87,35 @@ namespace Apache.Calcite.EntityFrameworkCore.Storage.Internal
                     }
                 },
                 null,
-                cancellationToken).ConfigureAwait(false))!
-            > 0;
+                cancellationToken).ConfigureAwait(false);
+        }
 
-        IRelationalCommand CreateHasTablesCommand(IRelationalConnection connection)
+        /// <summary>
+        /// Returns <c>true</c>
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <returns></returns>
+        static bool HasUserTables(CalciteConnection connection)
         {
-            // HasTables answers "are there already user tables EF would have created?" so EnsureCreated
-            // can decide whether to skip table creation. EF entities can span multiple schemas, so we
-            // don't constrain the query by schema. We do, however, exclude Calcite's built-in metadata
-            // catalog so the count reflects only user-created tables.
-            return _rawSqlCommandBuilder.Build(@"
-SELECT COUNT(*)
-FROM ""metadata"".""TABLES""
-WHERE ""tableType"" = 'TABLE'
-  AND ""tableSchem"" <> 'metadata'
-");
+            // check root-level tables
+            if (connection.RootSchema.getTableNames().size() > 0)
+                return true;
+
+            // check other schemas besides metadata
+            foreach (var schemaName in connection.RootSchema.getSubSchemaNames().AsEnumerable<string>())
+            {
+                if (schemaName == "metadata")
+                    continue;
+
+                var schema = connection.RootSchema.getSubSchema(schemaName);
+                if (schema is null)
+                    continue;
+
+                if (schema.getTableNames().size() > 0)
+                    return true;
+            }
+
+            return false;
         }
 
         /// <inheritdoc/>
@@ -251,7 +256,7 @@ WHERE ""tableType"" = 'TABLE'
             var keyLiteral = FormatLiteral(sequence.KeyValue!);
             var valueLiteral = FormatLiteral(Convert.ChangeType(CalciteEntitySequence.DefaultStartValue, valueProperty.ClrType));
 
-            var sb = new StringBuilder();
+            var sb = new System.Text.StringBuilder();
             sb.Append("INSERT INTO ").Append(qualifiedTable)
                 .Append(" (").Append(keyColumn).Append(", ").Append(valueColumn).Append(") ")
                 .Append("VALUES (").Append(keyLiteral).Append(", ").Append(valueLiteral).Append(')');

@@ -38,7 +38,7 @@ namespace Apache.Calcite.EntityFrameworkCore.FunctionalTests.TestUtilities
 
         static string BuildConnectionString(string name)
         {
-            return $"conformance=LENIENT;parserFactory=org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
+            return $"schema=adhoc;conformance=LENIENT;parserFactory=org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
         }
 
         readonly string? _initScript;

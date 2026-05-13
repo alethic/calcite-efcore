@@ -10,19 +10,16 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
     {
 
         readonly CalciteConnection _connection;
-        readonly string _schema;
 
-        public HiLoDbContext(CalciteConnection connection, string schema)
+        public HiLoDbContext(CalciteConnection connection)
         {
             _connection = connection;
-            _schema = schema;
         }
 
         public DbSet<Product> Products { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema(_schema);
             modelBuilder.UseHiLoEntitySequence();
             modelBuilder.Entity<Product>();
         }

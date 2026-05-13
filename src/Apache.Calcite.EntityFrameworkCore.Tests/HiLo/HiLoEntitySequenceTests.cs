@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 
 using Apache.Calcite.Data;
 
+using java.lang;
+
 using Xunit;
 
 namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
@@ -29,9 +31,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
         static CalciteConnection CreateConnection(string schema)
         {
             var str = new CalciteConnectionStringBuilder();
-            str.Schema = schema;
-            str.Conformance = "LENIENT";
-            str["parserFactory"] = "org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
+            str.Model = $"inline:{{\"version\":\"1.0\",\"defaultSchema\":\"{schema}\",\"schemas\":[{{\"name\":\"{schema}\"}}]}}";
+            str.ParserFactory = "org.apache.calcite.server.ServerDdlExecutor#PARSER_FACTORY";
             return new CalciteConnection(str.ToString());
         }
 
@@ -39,7 +40,9 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
         {
             var schema = "S" + Guid.NewGuid().ToString("N");
             var conn = CreateConnection(schema);
-            var ctx = new HiLoDbContext(conn, schema);
+            conn.Open();
+
+            var ctx = new HiLoDbContext(conn);
             await ctx.Database.EnsureCreatedAsync();
             return (conn, ctx, schema);
         }
@@ -47,33 +50,55 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
         [Fact]
         public async Task Sequence_table_is_created()
         {
-            var (conn, ctx, _) = await CreateAndInitializeAsync();
+            var (conn, ctx, schema) = await CreateAndInitializeAsync();
             using (conn)
             using (ctx)
             {
                 if (conn.State != System.Data.ConnectionState.Open)
                     conn.Open();
 
-                var schema = conn.Database;
+                var root = conn.RootSchema;
 
-                using var cmd = conn.CreateCommand();
-                cmd.CommandText = "SELECT \"tableSchem\", \"tableName\", \"tableType\" FROM \"metadata\".\"TABLES\"";
+                bool found = false;
 
-                var found = new System.Collections.Generic.List<string>();
-                using (var reader = cmd.ExecuteReader())
+                // Check tables directly on the root schema.
+                foreach (var tableName in root.getTableNames().AsEnumerable<string>())
                 {
-                    while (reader.Read())
+                    if (tableName == "CalciteSequence")
                     {
-                        var s = reader.IsDBNull(0) ? "<null>" : reader.GetString(0);
-                        var n = reader.IsDBNull(1) ? "<null>" : reader.GetString(1);
-                        var t = reader.IsDBNull(2) ? "<null>" : reader.GetString(2);
-                        found.Add($"{s}.{n} ({t})");
+                        found = true;
+                        break;
                     }
                 }
 
-                Assert.True(
-                    found.Exists(t => t.Contains(".CalciteSequence ")),
-                    $"EnsureCreated should have created the CalciteSequence backing table in schema '{schema}'. All metadata.TABLES rows: [{string.Join(", ", found)}]");
+                // Check tables in each non-metadata sub-schema.
+                if (!found)
+                {
+                    foreach (var schemaName in root.getSubSchemaNames().AsEnumerable<string>())
+                    {
+                        if (schemaName == "metadata")
+                            continue;
+
+                        var sub = root.getSubSchema(schemaName);
+                        if (sub is null)
+                            continue;
+
+                        foreach (var tableName in sub.getTableNames().AsEnumerable<string>())
+                        {
+                            if (tableName == "CalciteSequence")
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found)
+                            break;
+                    }
+                }
+
+                Assert.True(found,
+                    $"EnsureCreated should have created the CalciteSequence backing table in schema '{schema}'.");
             }
         }
 
@@ -135,28 +160,29 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.HiLo
         [Fact]
         public async Task Can_update_inserted_rows()
         {
-            var (conn, ctx, schema) = await CreateAndInitializeAsync();
+            var (conn, ctx, _) = await CreateAndInitializeAsync();
             using (conn)
-            using (ctx)
             {
-                var product = new Product { Name = "Original", Price = 5m };
-                ctx.Products.Add(product);
-                await ctx.SaveChangesAsync();
+                using (ctx)
+                {
+                    var product = new Product { Name = "Original", Price = 5m };
+                    ctx.Products.Add(product);
+                    await ctx.SaveChangesAsync();
 
-                var id = product.Id;
-                Assert.True(id > 0);
+                    var id = product.Id;
+                    Assert.True(id > 0);
 
-                product.Name = "Updated";
-                product.Price = 7.5m;
-                await ctx.SaveChangesAsync();
-            }
+                    product.Name = "Updated";
+                    product.Price = 7.5m;
+                    await ctx.SaveChangesAsync();
+                }
 
-            using (conn)
-            using (var verify = new HiLoDbContext(conn, schema))
-            {
-                var loaded = verify.Products.Single();
-                Assert.Equal("Updated", loaded.Name);
-                Assert.Equal(7.5m, loaded.Price);
+                using (var verify = new HiLoDbContext(conn))
+                {
+                    var loaded = verify.Products.Single();
+                    Assert.Equal("Updated", loaded.Name);
+                    Assert.Equal(7.5m, loaded.Price);
+                }
             }
         }
 

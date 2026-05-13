@@ -31,7 +31,7 @@ namespace Apache.Calcite.EntityFrameworkCore.Tests.Storage
         {
             var schema = "S" + Guid.NewGuid().ToString("N");
             var conn = CreateConnection(schema);
-            var ctx = new HiLoDbContext(conn, schema);
+            var ctx = new HiLoDbContext(conn);
             var creator = (IRelationalDatabaseCreator)ctx.GetService<IDatabaseCreator>();
             return (conn, ctx, creator);
         }

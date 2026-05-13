@@ -72,10 +72,8 @@ namespace Apache.Calcite.EntityFrameworkCore.Scaffolding.Internal
         {
             var model = new DatabaseModel();
             model.DatabaseName = connection.Database;
-            model.DefaultSchema = connection.RootSchema.getName();
 
             var typeFactory = connection.TypeFactory;
-
             foreach (var schema in GetSchemas(connection.RootSchema))
                 foreach (var table in GetTables(model, schema, typeFactory))
                     model.Tables.Add(table);
